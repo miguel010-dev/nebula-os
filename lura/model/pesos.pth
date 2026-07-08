@@ -1,0 +1,110 @@
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+import os
+import sys
+
+# Garante que o diretório raiz do projeto esteja no caminho
+# Isso é importante para que as importações absolutas (model.modelo, utils.tokenizer) funcionem
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Importações Absolutas
+from model.modelo import ModeloLeve
+from utils.tokenizer import Tokenizer
+from utils.preprocessing import preprocessar_texto # Assumindo essa função no preprocessing.py
+
+# --- 1. CONFIGURAÇÕES GERAIS ---
+# Ajuste estes hiperparâmetros conforme necessário
+HIPERPARAMETROS = {
+    'SEQ_LEN': 20, # Tamanho da sequência de entrada (igual ao usado na inferência)
+    'EMBED_SIZE': 128,
+    'HIDDEN_SIZE': 256,
+    'BATCH_SIZE': 32,
+    'LEARNING_RATE': 0.001,
+    'EPOCHS': 10,
+    'CAMINHO_DADOS': '../data/textos.txt',
+    'CAMINHO_PESOS': 'pesos.pth' # Salvo na mesma pasta (model/)
+}
+
+# --- 2. CLASSE PERSONALIZADA DO DATASET ---
+class TextoDataset(Dataset):
+    def __init__(self, tokens, seq_len):
+        self.tokens = tokens
+        self.seq_len = seq_len
+        self.dados = []
+        
+        # Cria pares de (entrada, alvo)
+        # Ex: "o ceu estava azul" -> entrada=["o", "ceu", "estava"], alvo="azul"
+        for i in range(len(self.tokens) - self.seq_len):
+            entrada = self.tokens[i:i + self.seq_len]
+            alvo = self.tokens[i + self.seq_len]
+            self.dados.append((torch.tensor(entrada), torch.tensor(alvo)))
+
+    def __len__(self):
+        return len(self.dados)
+
+    def __getitem__(self, idx):
+        return self.dados[idx]
+
+# --- 3. FUNÇÃO PRINCIPAL DE TREINAMENTO ---
+def treinar_modelo():
+    # Carregar e pré-processar o texto
+    print("Iniciando carregamento e processamento dos dados...")
+    with open(HIPERPARAMETROS['CAMINHO_DADOS'], 'r', encoding='utf-8') as f:
+        texto_bruto = f.read()
+
+    texto_limpo = preprocessar_texto(texto_bruto)
+    
+    # Inicializar Tokenizer e preparar dados
+    tokenizer = Tokenizer()
+    tokenizer.aprender_vocabulario(texto_limpo) # Função a ser implementada no tokenizer
+    tokens_numericos = tokenizer.texto_para_tokens(texto_limpo)
+
+    # Preparar DataLoader
+    dataset = TextoDataset(tokens_numericos, HIPERPARAMETROS['SEQ_LEN'])
+    dataloader = DataLoader(dataset, batch_size=HIPERPARAMETROS['BATCH_SIZE'], shuffle=True)
+
+    # Inicializar Modelo, Otimizador e Função de Perda
+    vocab_size = tokenizer.vocab_size
+    modelo = ModeloLeve(vocab_size, HIPERPARAMETROS['EMBED_SIZE'], HIPERPARAMETROS['HIDDEN_SIZE'])
+    
+    # Define o dispositivo de treino (CPU ou GPU)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    modelo.to(device)
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(modelo.parameters(), lr=HIPERPARAMETROS['LEARNING_RATE'])
+
+    print(f"Iniciando treinamento com {HIPERPARAMETROS['EPOCHS']} epochs no dispositivo: {device}")
+
+    # Loop de Treinamento
+    for epoch in range(HIPERPARAMETROS['EPOCHS']):
+        modelo.train()
+        total_loss = 0
+        for i, (entradas, alvos) in enumerate(dataloader):
+            entradas, alvos = entradas.to(device), alvos.to(device)
+            
+            # Forward pass
+            saidas, _ = modelo(entradas)
+            
+            # A função de perda espera: (Batch_size * Vocab_size) e (Batch_size)
+            loss = criterion(saidas, alvos) 
+            
+            # Backward and optimize
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            
+            total_loss += loss.item()
+
+        media_loss = total_loss / len(dataloader)
+        print(f"Epoch [{epoch+1}/{HIPERPARAMETROS['EPOCHS']}], Loss: {media_loss:.4f}")
+
+    # Salvar o modelo treinado
+    caminho_salvamento = os.path.join(os.path.dirname(__file__), HIPERPARAMETROS['CAMINHO_PESOS'])
+    torch.save(modelo.state_dict(), caminho_salvamento)
+    print(f"\nTreinamento concluído. Pesos salvos em: {caminho_salvamento}")
+
+# --- 4. EXECUÇÃO ---
+if __name__ == '__main__':
+    treinar_modelo()
