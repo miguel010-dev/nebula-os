@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nebula Browser</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #1e1e2f;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .topbar {
+      display: flex;
+      padding: 10px;
+      background: #2b2b44;
+    }
+    .topbar input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    .topbar button {
+      background: #8c52ff;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .topbar button:hover {
+      background: #613cc1;
+    }
+    #browser {
+      flex: 1;
+      background: #fff;
+      color: #000;
+      overflow: auto;
+      padding: 20px;
+      border-radius: 12px 12px 0 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <input type="text" id="url" placeholder="Digite a URL (ex: https://www.google.com)">
+    <button onclick="navegar()">Ir</button>
+  </div>
+  <div id="browser">Digite uma URL acima para começar 🚀</div>
+
+  <script>
+    let ws = new WebSocket("ws://localhost:8765");
+
+    ws.onopen = () => {
+      console.log("✅ Conectado ao servidor WebSocket");
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.error) {
+        document.getElementById("browser").innerHTML = `<p style="color:red">Erro: ${data.error}</p>`;
+      } else {
+        document.getElementById("browser").innerHTML = `
+          <h2>${data.title}</h2>
+          <p><b>URL:</b> ${data.url}</p>
+          <p><b>Tamanho HTML:</b> ${data.length} caracteres</p>
+        `;
+      }
+    };
+
+    function navegar() {
+      const url = document.getElementById("url").value;
+      if (!url) return;
+      document.getElementById("browser").innerHTML = "⏳ Carregando...";
+
+      ws.send(JSON.stringify({ url }));
+    }
+  </script>
+</body>
+</html>

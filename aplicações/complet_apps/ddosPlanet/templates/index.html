@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Over drive</title>
+  <style>
+    /* Reset básico */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #000000, #111111, #1a1a1a);
+      color: #f1f1f1;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .content {
+      background: rgba(30, 30, 30, 0.8);
+      backdrop-filter: blur(12px);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+      width: 350px;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .content p.title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #0d6efd, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .content h3, .content p.label {
+      margin-bottom: 6px;
+      font-weight: 500;
+      text-align: left;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 18px;
+      border: none;
+      border-radius: 12px;
+      background: #222;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      background: #2d2d2d;
+      box-shadow: 0 0 0 2px #0d6efd;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #0d6efd, #00d4ff);
+      color: #fff;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <p class="title">Painel Moderno</p>
+    
+    <h3>Nome do ataque</h3>
+    <input type="text" id="nomeatack" placeholder="Digite o nome">
+
+    <h3>Link alvo</h3>
+    <input type="url" id="link" placeholder="https://exemplo.com">
+
+    <h3>Número total de requisições</h3>
+    <input type="number" id="requisoestotal" placeholder="Ex: 10000">
+
+    <p class="label">Requisições por segundo</p>
+    <input type="number" id="requisoessegundo" placeholder="Ex: 500">
+
+    <button>Iniciar</button>
+  </div>
+</body>
+</html>

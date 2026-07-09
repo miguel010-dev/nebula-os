@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuraBot</title>
+  <style>
+    /* ===== Fundo com aura animada ===== */
+    body {
+      margin: 0;
+      font-family: "Inter", Arial, sans-serif;
+      background: linear-gradient(-45deg, #1a1b26, #2a003f, #3a0ca3, #7209b7, #4361ee);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #ececf1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ===== Container do chat ===== */
+    .chat-container {
+      width: 90%;
+      max-width: 800px;
+      height: 90vh;
+      background: rgba(40, 40, 55, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(140, 82, 255, 0.6);
+      border: 1px solid rgba(140, 82, 255, 0.3);
+    }
+
+    .chat-header {
+      background: rgba(20, 20, 30, 0.9);
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      border-bottom: 1px solid rgba(140, 82, 255, 0.4);
+      color: #b197fc;
+      letter-spacing: 1px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .message {
+      padding: 14px 18px;
+      border-radius: 12px;
+      max-width: 75%;
+      line-height: 1.4;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .user {
+      background: linear-gradient(135deg, #7209b7, #3a0ca3);
+      color: #fff;
+      align-self: flex-end;
+      box-shadow: 0 0 10px rgba(114, 9, 183, 0.5);
+    }
+
+    .bot {
+      background: rgba(60, 60, 80, 0.9);
+      align-self: flex-start;
+      color: #ececf1;
+      box-shadow: 0 0 10px rgba(140, 82, 255, 0.3);
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 12px;
+      background: rgba(20, 20, 30, 0.9);
+      border-top: 1px solid rgba(140, 82, 255, 0.3);
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      font-size: 15px;
+      background: rgba(60, 60, 80, 0.85);
+      color: #ececf1;
+    }
+
+    .chat-input input::placeholder {
+      color: #aaa;
+    }
+
+    .chat-input button {
+      margin-left: 10px;
+      background: linear-gradient(135deg, #7209b7, #3a0ca3);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 15px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .chat-input button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(140, 82, 255, 0.7);
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(5px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">Nebula</div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot">Olá! Eu sou o NeuraBot. Pronto para conversar? 💜</div>
+    </div>
+    <div class="chat-input">
+        <form action="/mensagem" method="post">
+      <input type="text" name="mensagem" id="userInput" placeholder="Digite sua mensagem e pressione Enter...">
+      <button type="submit" onclick="sendMessage()">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('userInput');
+    const messages = document.getElementById('chatMessages');
+
+    function sendMessage() {
+      const userText = input.value.trim();
+      if (userText === "") return;
+
+      addMessage(userText, "user");
+
+      // Resposta fake do bot com delay + "digitando"
+      setTimeout(() => {
+        addMessage("💡 Você disse: " + userText, "bot");
+      }, 1000);
+
+      input.value = "";
+    }
+
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.className = "message " + sender;
+      msg.innerText = text;
+      messages.appendChild(msg);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    // Enviar com Enter
+    input.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>

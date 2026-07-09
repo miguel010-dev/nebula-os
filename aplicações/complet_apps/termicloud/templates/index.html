@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebula Terminal</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background-color: black;
+    color: white;
+    font-family: monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #terminal {
+    width: 90%;
+    max-width: 800px;
+    height: 80%;
+    background-color: rgba(0,0,0,1);
+    padding: 20px;
+    overflow-y: auto;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #fff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .line {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 2px;
+  }
+
+  .prompt {
+    margin-right: 5px;
+  }
+
+  #input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-family: monospace;
+    font-weight: bold;
+    flex: 1;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+<div id="terminal">
+  <div class="line">
+    <span class="prompt">N:\NebulaOS\user\terminal&gt;</span>
+    <input type="text" id="input" name="input" autofocus>
+  </div>
+</div>
+
+<script>
+const input = document.getElementById('input');
+const terminal = document.getElementById('terminal');
+
+input.addEventListener('keydown', function(e) {
+  if(e.key === 'Enter'){
+    const value = input.value.trim();
+    if(value){
+      const newLine = document.createElement('div');
+      newLine.className = 'line';
+      newLine.innerHTML = `<span class="prompt">C:\\NebulaOS\\user&gt;</span> ${value}`;
+      terminal.insertBefore(newLine, terminal.lastElementChild);
+    }
+    input.value = '';
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+});
+</script>
+</body>
+</html>
