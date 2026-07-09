@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SquareOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SquareOS — design tokens
+   ============================================================ */
+:root{
+  --accent:#8B7CFF;
+  --accent-2:#FF7CD4;
+  --accent-soft: rgba(139,124,255,.18);
+  --bg-0:#07070d;
+  --bg-1:#0d0d18;
+  --glass: rgba(18,18,30,.62);
+  --glass-strong: rgba(14,14,24,.82);
+  --glass-border: rgba(255,255,255,.09);
+  --hairline: rgba(255,255,255,.07);
+  --text-0:#f3f2fb;
+  --text-1:#c7c4dc;
+  --text-2:#8a87a3;
+  --danger:#ff5f68;
+  --warn:#ffbd2e;
+  --ok:#31d17c;
+  --radius-xl:22px;
+  --radius-lg:16px;
+  --radius-md:11px;
+  --radius-sm:7px;
+  --shadow-window: 0 30px 70px -20px rgba(0,0,0,.65), 0 0 0 1px var(--glass-border) inset;
+  --font-display:'Space Grotesk', 'Inter', sans-serif;
+  --font-ui:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:'JetBrains Mono', 'Monaco', monospace;
+  --ease: cubic-bezier(.22,.9,.3,1);
+}
+
+[data-theme="light"]{
+  --bg-0:#eef0fa;
+  --bg-1:#e3e6f5;
+  --glass: rgba(255,255,255,.62);
+  --glass-strong: rgba(255,255,255,.86);
+  --glass-border: rgba(20,20,40,.08);
+  --hairline: rgba(20,20,40,.08);
+  --text-0:#141327;
+  --text-1:#3c3a55;
+  --text-2:#6f6c8a;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html,body{ height:100%; }
+
+body{
+  height:100vh; overflow:hidden;
+  font-family:var(--font-ui);
+  color:var(--text-0);
+  background: var(--bg-0);
+  -webkit-font-smoothing:antialiased;
+}
+
+::selection{ background:var(--accent); color:#fff; }
+
+/* Scrollbars */
+*::-webkit-scrollbar{ width:9px; height:9px; }
+*::-webkit-scrollbar-track{ background:transparent; }
+*::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.16); border-radius:10px; }
+*::-webkit-scrollbar-thumb:hover{ background:rgba(255,255,255,.28); }
+
+button, input, select, textarea{ font-family:inherit; color:inherit; }
+
+/* ============================================================
+   Wallpaper / boot
+   ============================================================ */
+#wallpaper{
+  position:fixed; inset:0; z-index:0;
+  background-size:cover; background-position:center; transition:background-image .6s var(--ease);
+}
+#wallpaper::before{
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(1200px 700px at 18% 8%, var(--accent-soft), transparent 60%),
+              radial-gradient(900px 600px at 85% 90%, rgba(255,124,212,.14), transparent 55%);
+  pointer-events:none;
+}
+#wallpaper::after{
+  content:''; position:absolute; inset:0; background:rgba(0,0,0,.16); pointer-events:none;
+}
+[data-theme="light"] #wallpaper::after{ background:rgba(255,255,255,.06); }
+
+#boot{
+  position:fixed; inset:0; z-index:9999; background:#050508;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+  transition:opacity .5s var(--ease), visibility .5s;
+}
+#boot.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+.boot-mark{ width:56px; height:56px; position:relative; }
+.boot-mark svg{ width:100%; height:100%; }
+.boot-ring{ transform-origin:center; animation:spin 1.1s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.boot-label{ font-family:var(--font-display); letter-spacing:.14em; font-size:12px; color:var(--text-2); text-transform:uppercase; }
+
+/* ============================================================
+   Top bar
+   ============================================================ */
+.topbar{
+  position:fixed; top:0; left:0; width:100%; height:34px; z-index:900;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 14px;
+  background:linear-gradient(to bottom, rgba(0,0,0,.32), transparent);
+  font-size:13px; color:var(--text-0);
+  user-select:none;
+}
+.topbar-left, .topbar-right{ display:flex; align-items:center; gap:16px; height:100%; }
+.brand{ display:flex; align-items:center; gap:7px; font-family:var(--font-display); font-weight:600; letter-spacing:.02em; cursor:pointer; }
+.brand svg{ width:15px; height:15px; }
+.menu-word{ opacity:.82; font-weight:500; cursor:default; }
+.topbar-clock{ font-variant-numeric:tabular-nums; font-weight:600; letter-spacing:.02em; }
+.status-btn{
+  display:flex; align-items:center; justify-content:center;
+  width:26px; height:22px; border-radius:7px; cursor:pointer; background:transparent; border:none; color:var(--text-0);
+  transition:background .15s;
+}
+.status-btn:hover{ background:rgba(255,255,255,.12); }
+.status-btn svg{ width:15px; height:15px; }
+
+/* ============================================================
+   Desktop icons
+   ============================================================ */
+.desktop{ position:absolute; inset:34px 0 74px 0; z-index:1; }
+.dicon{
+  position:absolute; width:86px; display:flex; flex-direction:column; align-items:center; gap:6px;
+  padding:8px 4px; border-radius:var(--radius-sm); cursor:default; user-select:none;
+}
+.dicon .glyph{
+  width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.06); border:1px solid var(--glass-border);
+  backdrop-filter: blur(6px);
+  transition:transform .18s var(--ease), background .18s, box-shadow .18s;
+}
+.dicon .glyph svg{ width:24px; height:24px; color:var(--text-0); }
+.dicon span{
+  font-size:11.5px; text-align:center; line-height:1.25; padding:2px 6px; border-radius:5px;
+  text-shadow:0 1px 3px rgba(0,0,0,.5); color:var(--text-0);
+}
+.dicon:hover .glyph{ transform:translateY(-2px); background:rgba(255,255,255,.12); }
+.dicon.selected .glyph{ background:var(--accent-soft); box-shadow:0 0 0 1.5px var(--accent); }
+.dicon.selected span{ background:var(--accent); color:#fff; text-shadow:none; }
+
+/* ============================================================
+   Dock
+   ============================================================ */
+.dock-wrap{ position:fixed; bottom:12px; left:50%; transform:translateX(-50%); z-index:850; }
+.dock{
+  display:flex; align-items:flex-end; gap:9px;
+  padding:9px 12px; border-radius:20px;
+  background:var(--glass); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+  border:1px solid var(--glass-border); box-shadow:0 18px 40px -12px rgba(0,0,0,.55);
+}
+.dock-icon{
+  position:relative; width:46px; height:46px; border-radius:13px; cursor:pointer; border:none;
+  background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center;
+  transition:transform .16s var(--ease), background .16s;
+}
+.dock-icon svg{ width:22px; height:22px; color:var(--text-0); }
+.dock-icon:hover{ transform:translateY(-8px) scale(1.08); background:rgba(255,255,255,.14); }
+.dock-icon.running::after{
+  content:''; position:absolute; bottom:-7px; left:50%; transform:translateX(-50%);
+  width:4px; height:4px; border-radius:50%; background:var(--accent);
+}
+.dock-sep{ width:1px; align-self:stretch; margin:4px 2px; background:var(--hairline); }
+.dock-icon.launcher{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.dock-icon.launcher svg{ color:#fff; }
+
+/* ============================================================
+   Start menu / launcher grid
+   ============================================================ */
+.launcher-panel{
+  position:fixed; bottom:70px; left:50%; transform:translateX(-50%) translateY(14px); z-index:880;
+  width:420px; padding:18px; border-radius:var(--radius-xl);
+  background:var(--glass-strong); backdrop-filter:blur(30px) saturate(160%); -webkit-backdrop-filter:blur(30px) saturate(160%);
+  border:1px solid var(--glass-border); box-shadow:var(--shadow-window);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .22s var(--ease), transform .22s var(--ease), visibility .22s;
+}
+.launcher-panel.open{ opacity:1; visibility:visible; pointer-events:auto; transform:translateX(-50%) translateY(0); }
+.launcher-search{
+  width:100%; padding:10px 12px; border-radius:var(--radius-md); border:1px solid var(--glass-border);
+  background:rgba(255,255,255,.05); color:var(--text-0); font-size:13px; outline:none; margin-bottom:14px;
+}
+.launcher-search:focus{ border-color:var(--accent); }
+.launcher-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-height:320px; overflow:auto; }
+.launcher-item{
+  display:flex; flex-direction:column; align-items:center; gap:7px; padding:12px 6px; border-radius:var(--radius-md);
+  cursor:pointer; background:transparent; transition:background .15s;
+}
+.launcher-item:hover{ background:rgba(255,255,255,.08); }
+.launcher-item .glyph{ width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.08); }
+.launcher-item .glyph svg{ width:21px; height:21px; }
+.launcher-item span{ font-size:11px; color:var(--text-1); text-align:center; }
+
+/* ============================================================
+   Notification panel
+   ============================================================ */
+.notif-panel{
+  position:fixed; top:40px; right:14px; z-index:920; width:320px;
+  display:flex; flex-direction:column; gap:8px;
+  opacity:0; visibility:hidden; transform:translateY(-10px);
+  transition:opacity .22s var(--ease), transform .22s var(--ease), visibility .22s;
+}
+.notif-panel.open{ opacity:1; visibility:visible; transform:translateY(0); }
+.notif-card{
+  padding:13px 15px; border-radius:var(--radius-lg);
+  background:var(--glass-strong); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+  border:1px solid var(--glass-border); box-shadow:0 12px 26px -10px rgba(0,0,0,.5);
+}
+.notif-card h4{ font-size:13px; margin-bottom:3px; font-weight:600; }
+.notif-card p{ font-size:12.5px; color:var(--text-1); line-height:1.45; }
+.notif-card .tag{ font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--accent); font-weight:700; margin-bottom:4px; display:block; }
+
+.toast-stack{ position:fixed; top:40px; left:50%; transform:translateX(-50%); z-index:9500; display:flex; flex-direction:column; gap:8px; align-items:center; }
+.toast{
+  padding:10px 18px; border-radius:999px; background:var(--glass-strong); backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border); font-size:12.5px; box-shadow:0 10px 24px -8px rgba(0,0,0,.5);
+  animation: toast-in .28s var(--ease);
+}
+@keyframes toast-in{ from{ opacity:0; transform:translateY(-8px);} to{ opacity:1; transform:translateY(0);} }
+
+/* ============================================================
+   Context menu
+   ============================================================ */
+.ctx-menu{
+  position:fixed; z-index:9600; min-width:190px; padding:6px; border-radius:var(--radius-md);
+  background:var(--glass-strong); backdrop-filter:blur(24px); border:1px solid var(--glass-border);
+  box-shadow:0 20px 40px -14px rgba(0,0,0,.6); display:none;
+}
+.ctx-menu.open{ display:block; }
+.ctx-item{
+  display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:var(--radius-sm); font-size:12.5px;
+  cursor:pointer; color:var(--text-0);
+}
+.ctx-item svg{ width:14px; height:14px; color:var(--text-2); }
+.ctx-item:hover{ background:var(--accent-soft); }
+.ctx-sep{ height:1px; background:var(--hairline); margin:5px 4px; }
+
+/* ============================================================
+   Windows
+   ============================================================ */
+.window{
+  position:absolute; display:none; flex-direction:column;
+  min-width:340px; min-height:220px;
+  background:var(--glass); backdrop-filter:blur(26px) saturate(150%); -webkit-backdrop-filter:blur(26px) saturate(150%);
+  border-radius:var(--radius-xl); border:1px solid var(--glass-border);
+  box-shadow:var(--shadow-window); overflow:hidden; z-index:50;
+  animation: win-in .22s var(--ease);
+}
+.window.active{ display:flex; }
+@keyframes win-in{ from{ opacity:0; transform:scale(.96) translateY(10px);} to{ opacity:1; transform:scale(1) translateY(0);} }
+
+.win-header{
+  height:42px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between;
+  padding:0 14px; cursor:move; user-select:none;
+  background:linear-gradient(to bottom, rgba(255,255,255,.05), transparent);
+  border-bottom:1px solid var(--hairline);
+}
+.win-title{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--text-1); }
+.win-title svg{ width:14px; height:14px; color:var(--text-2); }
+.win-controls{ display:flex; gap:8px; }
+.wctl{ width:12px; height:12px; border-radius:50%; cursor:pointer; border:none; position:relative; }
+.wctl.close{ background:#ff5f56; } .wctl.min{ background:#ffbd2e; } .wctl.max{ background:#27c93f; }
+.wctl svg{ position:absolute; inset:0; margin:auto; width:7px; height:7px; opacity:0; color:rgba(0,0,0,.55); }
+.win-header:hover .wctl svg{ opacity:1; }
+
+.win-body{ flex:1; overflow:auto; display:flex; flex-direction:column; min-height:0; }
+.resize-handle{ position:absolute; right:2px; bottom:2px; width:16px; height:16px; cursor:nwse-resize; z-index:5; }
+
+/* ============================================================
+   Files app
+   ============================================================ */
+.files-toolbar{ display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--hairline); flex-wrap:wrap; }
+.tbtn{
+  display:flex; align-items:center; gap:6px; padding:7px 11px; border-radius:var(--radius-sm); border:1px solid var(--glass-border);
+  background:rgba(255,255,255,.04); font-size:12px; cursor:pointer; color:var(--text-0); transition:background .15s;
+}
+.tbtn:hover{ background:rgba(255,255,255,.1); }
+.tbtn:disabled{ opacity:.35; cursor:default; }
+.tbtn svg{ width:13px; height:13px; }
+.crumbs{ font-size:12px; color:var(--text-2); display:flex; align-items:center; gap:4px; padding:6px 14px; flex-wrap:wrap; }
+.crumb{ cursor:pointer; color:var(--text-1); }
+.crumb:hover{ color:var(--accent); }
+.file-grid{ flex:1; overflow:auto; padding:14px; display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:10px; align-content:start; }
+.fitem{
+  display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 6px; border-radius:var(--radius-md);
+  cursor:pointer; text-align:center; transition:background .15s;
+}
+.fitem:hover{ background:rgba(255,255,255,.07); }
+.fitem .glyph{ width:44px; height:44px; border-radius:11px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.05); }
+.fitem .glyph svg{ width:21px; height:21px; }
+.fitem .glyph.folder{ background:rgba(255,189,46,.12); } .fitem .glyph.folder svg{ color:#ffbd2e; }
+.fitem .glyph.file{ background:var(--accent-soft); } .fitem .glyph.file svg{ color:var(--accent); }
+.fitem .glyph.img{ background:rgba(49,209,124,.12); } .fitem .glyph.img svg{ color:#31d17c; }
+.fitem span{ font-size:11px; color:var(--text-1); word-break:break-word; line-height:1.2; }
+.empty-state{ margin:auto; text-align:center; color:var(--text-2); font-size:12.5px; padding:30px; }
+
+.editor-wrap{ flex:1; display:flex; flex-direction:column; }
+.editor-bar{ display:flex; justify-content:space-between; align-items:center; padding:8px 14px; border-bottom:1px solid var(--hairline); font-size:12px; color:var(--text-2); }
+.editor-area{
+  flex:1; border:none; outline:none; resize:none; padding:14px; background:transparent; color:var(--text-0);
+  font-family:var(--font-mono); font-size:13px; line-height:1.6;
+}
+.editor-actions{ display:flex; gap:8px; padding:10px 14px; border-top:1px solid var(--hairline); justify-content:flex-end; }
+
+/* ============================================================
+   Terminal
+   ============================================================ */
+.terminal-body{ background:#08080f; flex:1; display:flex; flex-direction:column; }
+#term-output{ flex:1; overflow-y:auto; padding:14px 16px; font-family:var(--font-mono); font-size:13px; line-height:1.65; color:#d3d6ff; white-space:pre-wrap; }
+.term-line{ min-height:1.4em; }
+.term-accent{ color:var(--accent); }
+.term-error{ color:var(--danger); }
+.term-ascii{ color:var(--accent); white-space:pre; font-size:11px; line-height:1.25; margin-bottom:6px; }
+.term-input-row{ display:flex; align-items:center; gap:8px; padding:10px 16px; border-top:1px solid var(--hairline); font-family:var(--font-mono); font-size:13px; }
+.term-prompt{ color:var(--accent); font-weight:700; white-space:nowrap; }
+#term-input{ flex:1; background:transparent; border:none; outline:none; color:#eef; font-family:inherit; font-size:inherit; }
+
+/* ============================================================
+   Settings
+   ============================================================ */
+.settings-layout{ display:flex; flex:1; min-height:0; }
+.settings-nav{ width:158px; flex-shrink:0; border-right:1px solid var(--hairline); padding:10px; display:flex; flex-direction:column; gap:2px; }
+.snav-btn{
+  display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:var(--radius-sm); border:none; background:transparent;
+  color:var(--text-2); font-size:12.5px; text-align:left; cursor:pointer; transition:.15s;
+}
+.snav-btn svg{ width:14px; height:14px; }
+.snav-btn:hover{ background:rgba(255,255,255,.06); color:var(--text-0); }
+.snav-btn.active{ background:var(--accent-soft); color:var(--text-0); }
+.settings-content{ flex:1; overflow:auto; padding:22px 26px; }
+.settings-content h3{ font-family:var(--font-display); font-size:16px; margin-bottom:16px; }
+.set-group{ padding:16px; border:1px solid var(--hairline); border-radius:var(--radius-lg); background:rgba(255,255,255,.02); margin-bottom:14px; }
+.set-group h4{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-2); margin-bottom:12px; }
+.swatches{ display:flex; gap:12px; flex-wrap:wrap; }
+.swatch{ width:64px; text-align:center; cursor:pointer; }
+.swatch .prev{ height:40px; border-radius:9px; border:2px solid transparent; margin-bottom:6px; }
+.swatch.active .prev{ border-color:var(--accent); }
+.swatch span{ font-size:10.5px; color:var(--text-2); }
+.accent-dots{ display:flex; gap:10px; }
+.adot{ width:26px; height:26px; border-radius:50%; cursor:pointer; border:2px solid transparent; }
+.adot.active{ border-color:#fff; }
+.set-row{ display:flex; align-items:center; justify-content:space-between; padding:9px 0; font-size:12.5px; color:var(--text-1); }
+.set-input{ width:100%; padding:9px 11px; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(255,255,255,.04); color:var(--text-0); font-size:12.5px; outline:none; }
+.set-input:focus{ border-color:var(--accent); }
+.toggle{ width:38px; height:22px; border-radius:20px; background:rgba(255,255,255,.14); position:relative; cursor:pointer; flex-shrink:0; }
+.toggle.on{ background:var(--accent); }
+.toggle::after{ content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform .18s var(--ease); }
+.toggle.on::after{ transform:translateX(16px); }
+.wall-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+.wall-thumb{ height:64px; border-radius:10px; background-size:cover; background-position:center; cursor:pointer; border:2px solid transparent; }
+.wall-thumb.active{ border-color:var(--accent); }
+.btn-primary{
+  padding:9px 16px; border-radius:var(--radius-sm); border:none; background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff; font-weight:600; font-size:12.5px; cursor:pointer;
+}
+.btn-primary:hover{ filter:brightness(1.08); }
+.about-block{ display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+.about-block .glyph{ width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; }
+.about-block .glyph svg{ width:26px; height:26px; color:#fff; }
+.about-line{ display:flex; justify-content:space-between; font-size:12.5px; padding:7px 0; border-bottom:1px solid var(--hairline); color:var(--text-1); }
+.about-line b{ color:var(--text-0); font-weight:600; }
+
+/* ============================================================
+   Generic placeholder / embed windows
+   ============================================================ */
+.embed-frame{ flex:1; border:none; width:100%; background:#0a0a12; }
+.placeholder-app{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:30px; text-align:center; }
+.placeholder-app .glyph{ width:64px; height:64px; border-radius:18px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; }
+.placeholder-app .glyph svg{ width:28px; height:28px; color:var(--accent); }
+.placeholder-app h3{ font-family:var(--font-display); font-size:16px; }
+.placeholder-app p{ font-size:12.5px; color:var(--text-2); max-width:280px; line-height:1.5; }
+
+/* ============================================================
+   Calculator
+   ============================================================ */
+.calc-body{ flex:1; display:flex; flex-direction:column; padding:14px; gap:12px; }
+.calc-display{ background:rgba(255,255,255,.04); border-radius:var(--radius-lg); padding:18px 16px; text-align:right; font-family:var(--font-mono); font-size:30px; font-weight:600; word-break:break-all; }
+.calc-grid{ flex:1; display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.calc-key{ border:none; border-radius:var(--radius-md); background:rgba(255,255,255,.06); color:var(--text-0); font-size:16px; cursor:pointer; transition:background .12s; }
+.calc-key:hover{ background:rgba(255,255,255,.13); }
+.calc-key.op{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
+.calc-key.eq{ background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; grid-row:span 2; }
+.calc-key.wide{ grid-column:span 2; }
+
+/* Lock screen (optional quick toggle) */
+.lock-screen{
+  position:fixed; inset:0; z-index:9800; background:rgba(4,4,10,.86); backdrop-filter:blur(30px);
+  display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#fff;
+}
+.lock-screen.open{ display:flex; }
+.lock-clock{ font-family:var(--font-display); font-size:58px; font-weight:600; }
+.lock-date{ color:var(--text-2); font-size:13px; text-transform:capitalize; }
+.lock-hint{ margin-top:26px; font-size:12px; color:var(--text-2); }
+
+@media (max-width:640px){
+  .window{ width:94vw !important; left:3vw !important; height:78vh !important; top:8vh !important; }
+  .launcher-panel{ width:88vw; }
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- Boot -->
+<div id="boot">
+  <div class="boot-mark">
+    <svg viewBox="0 0 64 64" fill="none">
+      <rect x="8" y="8" width="48" height="48" rx="14" stroke="var(--accent)" stroke-width="3" class="boot-ring"/>
+      <rect x="22" y="22" width="20" height="20" rx="6" fill="var(--accent)"/>
+    </svg>
+  </div>
+  <div class="boot-label">SquareOS iniciando…</div>
+</div>
+
+<div id="wallpaper"></div>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="brand" id="brand-menu">
+      <svg viewBox="0 0 64 64" fill="none"><rect x="8" y="8" width="48" height="48" rx="14" stroke="currentColor" stroke-width="4"/><rect x="24" y="24" width="16" height="16" rx="4" fill="currentColor"/></svg>
+      SquareOS
+    </div>
+    <span class="menu-word">Arquivo</span>
+    <span class="menu-word">Editar</span>
+    <span class="menu-word">Visualizar</span>
+  </div>
+  <div class="topbar-clock" id="clock">00:00</div>
+  <div class="topbar-right">
+    <button class="status-btn" title="Wi-Fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16.5a6 6 0 0 1 7 0"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg></button>
+    <button class="status-btn" title="Volume"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15"/><path d="M16 8a5 5 0 0 1 0 8"/></svg></button>
+    <button class="status-btn" title="Bateria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="18" height="10" rx="2"/><line x1="22" y1="10" x2="22" y2="14"/><rect x="4" y="9" width="12" height="6" fill="currentColor" stroke="none"/></svg></button>
+    <button class="status-btn" id="notif-toggle" title="Notificações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+  </div>
+</div>
+
+<!-- Desktop icons -->
+<div class="desktop" id="desktop"></div>
+
+<!-- Toasts -->
+<div class="toast-stack" id="toast-stack"></div>
+
+<!-- Notifications -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-card">
+    <span class="tag">Bem-vindo</span>
+    <h4>SquareOS está pronto</h4>
+    <p>Explore o Finder, o Terminal e as Configurações. Tudo roda localmente no seu navegador.</p>
+  </div>
+  <div class="notif-card">
+    <span class="tag">Dica</span>
+    <h4>Atalhos</h4>
+    <p>Clique com o botão direito na área de trabalho para ver ações rápidas.</p>
+  </div>
+</div>
+
+<!-- Context menu -->
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" data-action="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Atualizar</div>
+  <div class="ctx-item" data-action="newfolder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>Nova pasta</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" data-action="wallpaper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Alterar papel de parede</div>
+  <div class="ctx-item" data-action="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurações</div>
+</div>
+
+<!-- Dock -->
+<div class="dock-wrap">
+  <div class="dock" id="dock"></div>
+</div>
+
+<!-- Launcher / start menu -->
+<div class="launcher-panel" id="launcher">
+  <input class="launcher-search" id="launcher-search" placeholder="Pesquisar aplicativos…">
+  <div class="launcher-grid" id="launcher-grid"></div>
+</div>
+
+<!-- Lock screen -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-clock" id="lock-clock">00:00</div>
+  <div class="lock-date" id="lock-date">—</div>
+  <div class="lock-hint">Clique em qualquer lugar para entrar</div>
+</div>
+
+<!-- ================= WINDOWS ================= -->
+
+<!-- Files -->
+<div class="window" id="win-files" data-app="files" style="width:680px; height:480px; top:70px; left:90px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Finder</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body">
+    <div class="files-toolbar">
+      <button class="tbtn" id="files-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>Voltar</button>
+      <button class="tbtn" id="files-newfolder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Nova pasta</button>
+      <button class="tbtn" id="files-newfile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Novo arquivo</button>
+      <label class="tbtn" for="files-upload" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Enviar arquivo</label>
+      <input type="file" id="files-upload" style="display:none;">
+    </div>
+    <div class="crumbs" id="files-crumbs"></div>
+    <div class="file-grid" id="file-grid"></div>
+  </div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- File editor / viewer -->
+<div class="window" id="win-editor" data-app="editor" style="width:560px; height:440px; top:110px; left:180px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span id="editor-filename">arquivo.txt</span></div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body">
+    <div class="editor-wrap" id="editor-text-wrap">
+      <textarea class="editor-area" id="editor-text" spellcheck="false"></textarea>
+      <div class="editor-actions">
+        <button class="tbtn" id="editor-cancel">Fechar</button>
+        <button class="btn-primary" id="editor-save">Salvar</button>
+      </div>
+    </div>
+    <div id="editor-image-wrap" style="display:none; flex:1; align-items:center; justify-content:center; padding:20px;">
+      <img id="editor-image" style="max-width:100%; max-height:100%; border-radius:12px;">
+    </div>
+  </div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Terminal -->
+<div class="window" id="win-terminal" data-app="terminal" style="width:640px; height:440px; top:90px; left:260px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Terminal</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body terminal-body">
+    <div id="term-output"></div>
+    <div class="term-input-row">
+      <span class="term-prompt" id="term-prompt-live">square@nebula ~ ></span>
+      <input id="term-input" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Settings -->
+<div class="window" id="win-settings" data-app="settings" style="width:660px; height:480px; top:75px; left:340px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurações</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body">
+    <div class="settings-layout">
+      <div class="settings-nav" id="settings-nav">
+        <button class="snav-btn active" data-tab="s-appearance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.1-.7-.3-1-.2-.3-.3-.6-.3-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4-8-10-8z"/></svg>Aparência</button>
+        <button class="snav-btn" data-tab="s-wallpaper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Papel de parede</button>
+        <button class="snav-btn" data-tab="s-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Conta</button>
+        <button class="snav-btn" data-tab="s-security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Segurança</button>
+        <button class="snav-btn" data-tab="s-about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Sobre</button>
+      </div>
+      <div class="settings-content">
+
+        <div class="s-tab" id="s-appearance">
+          <h3>Aparência</h3>
+          <div class="set-group">
+            <h4>Tema</h4>
+            <div class="swatches" id="theme-swatches">
+              <div class="swatch active" data-theme="dark"><div class="prev" style="background:linear-gradient(135deg,#0d0d18,#1c1c2c);"></div><span>Escuro</span></div>
+              <div class="swatch" data-theme="light"><div class="prev" style="background:linear-gradient(135deg,#eef0fa,#d7dcf3);"></div><span>Claro</span></div>
+            </div>
+          </div>
+          <div class="set-group">
+            <h4>Cor de destaque</h4>
+            <div class="accent-dots" id="accent-dots">
+              <div class="adot active" data-accent="#8B7CFF,#FF7CD4" style="background:linear-gradient(135deg,#8B7CFF,#FF7CD4);"></div>
+              <div class="adot" data-accent="#22c1c3,#5cf2e0" style="background:linear-gradient(135deg,#22c1c3,#5cf2e0);"></div>
+              <div class="adot" data-accent="#ff7a59,#ffc371" style="background:linear-gradient(135deg,#ff7a59,#ffc371);"></div>
+              <div class="adot" data-accent="#31d17c,#9be15d" style="background:linear-gradient(135deg,#31d17c,#9be15d);"></div>
+              <div class="adot" data-accent="#ff5f8f,#ff8fb3" style="background:linear-gradient(135deg,#ff5f8f,#ff8fb3);"></div>
+            </div>
+          </div>
+          <div class="set-group">
+            <div class="set-row"><span>Reduzir transparência</span><div class="toggle" id="toggle-transparency"></div></div>
+            <div class="set-row"><span>Mostrar notificações</span><div class="toggle on" id="toggle-notifs"></div></div>
+          </div>
+        </div>
+
+        <div class="s-tab" id="s-wallpaper" style="display:none;">
+          <h3>Papel de parede</h3>
+          <div class="wall-grid" id="wall-grid"></div>
+          <div class="set-group">
+            <h4>URL personalizada</h4>
+            <input class="set-input" id="wallpaper-url" placeholder="https://…">
+            <div style="height:10px;"></div>
+            <button class="btn-primary" id="apply-wallpaper">Aplicar</button>
+          </div>
+        </div>
+
+        <div class="s-tab" id="s-account" style="display:none;">
+          <h3>Conta de usuário</h3>
+          <div class="set-group">
+            <h4>Perfil</h4>
+            <div class="set-row" style="flex-direction:column; align-items:stretch; gap:6px;"><span>Nome de usuário</span><input class="set-input" id="user-name" value="square"></div>
+            <div style="height:8px;"></div>
+            <div class="set-row" style="flex-direction:column; align-items:stretch; gap:6px;"><span>E-mail</span><input class="set-input" id="user-email" value="square@nebula.os"></div>
+          </div>
+          <button class="btn-primary" id="save-user">Salvar alterações</button>
+        </div>
+
+        <div class="s-tab" id="s-security" style="display:none;">
+          <h3>Segurança e privacidade</h3>
+          <div class="set-group">
+            <h4>Autenticação</h4>
+            <div class="set-row"><span>Exigir senha ao acordar</span><div class="toggle" id="toggle-lock"></div></div>
+            <div class="set-row"><span>Autenticação em 2 fatores</span><div class="toggle" id="toggle-2fa"></div></div>
+          </div>
+          <div class="set-group">
+            <h4>Firewall</h4>
+            <div class="set-row"><span>Status</span><div class="toggle on" id="toggle-firewall"></div></div>
+          </div>
+        </div>
+
+        <div class="s-tab" id="s-about" style="display:none;">
+          <h3>Sobre este Mac — digo, este SquareOS</h3>
+          <div class="about-block">
+            <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><rect x="9" y="9" width="6" height="6"/></svg></div>
+            <div><b style="font-family:var(--font-display); font-size:15px;">SquareOS</b><div style="color:var(--text-2); font-size:12px;">Versão 2.0 · Nebula</div></div>
+          </div>
+          <div class="about-line"><span>Kernel</span><b>SquareOS 6.6.15-nebula</b></div>
+          <div class="about-line"><span>Desenvolvedor</span><b>Miguel Viana</b></div>
+          <div class="about-line"><span>Motor de interface</span><b>Nebula Glass UI</b></div>
+          <div class="about-line"><span>Linguagem nativa</span><b>LINEAX</b></div>
+          <div class="about-line"><span>Memória</span><b>8192 MiB</b></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Calculator -->
+<div class="window" id="win-calc" data-app="calc" style="width:300px; height:420px; top:120px; left:420px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calculadora</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body calc-body">
+    <div class="calc-display" id="calc-display">0</div>
+    <div class="calc-grid" id="calc-grid"></div>
+  </div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Mail (placeholder) -->
+<div class="window" id="win-mail" data-app="mail" style="width:560px; height:420px; top:100px; left:300px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Mail</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body">
+    <div class="placeholder-app">
+      <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+      <h3>Nenhuma caixa de entrada conectada</h3>
+      <p>Conecte uma conta de e-mail nas Configurações para começar a receber mensagens no SquareOS.</p>
+    </div>
+  </div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Network -->
+<div class="window" id="win-rede" data-app="rede" style="width:640px; height:440px; top:95px; left:250px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Rede</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body"><iframe class="embed-frame" src="https://fast.com" loading="lazy"></iframe></div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Lura (intelligence) -->
+<div class="window" id="win-intelligence" data-app="intelligence" style="width:640px; height:460px; top:85px; left:280px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5c0 2 1 3 1 5v2a4 4 0 0 0 8 0v-2c0-2 1-3 1-5a5 5 0 0 0-5-5z"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Lura</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body"><iframe class="embed-frame" src="https://lura-r2b8.onrender.com/" loading="lazy"></iframe></div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Store -->
+<div class="window" id="win-store" data-app="store" style="width:640px; height:460px; top:80px; left:260px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Square Store</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body"><iframe class="embed-frame" src="https://squareos.site/loja" loading="lazy"></iframe></div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Code / IDE -->
+<div class="window" id="win-code" data-app="code" style="width:700px; height:480px; top:75px; left:230px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Ecapi Code</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body"><iframe class="embed-frame" src="https://squareos.site/ide" loading="lazy"></iframe></div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Search / SIS -->
+<div class="window" id="win-search" data-app="search" style="width:700px; height:480px; top:65px; left:200px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>SIS</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body"><iframe class="embed-frame" src="https://sis-security-info-system.onrender.com/" loading="lazy"></iframe></div>
+  <div class="resize-handle"></div>
+</div>
+
+<!-- Shutdown -->
+<div class="window" id="win-shutdown" data-app="shutdown" style="width:340px; height:190px; top:40%; left:50%; margin-left:-170px;">
+  <div class="win-header">
+    <div class="win-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>Desligar</div>
+    <div class="win-controls">
+      <button class="wctl min"></button><button class="wctl max"></button><button class="wctl close"></button>
+    </div>
+  </div>
+  <div class="win-body" style="align-items:center; justify-content:center; padding:22px; gap:16px;">
+    <p style="text-align:center; font-size:13.5px; color:var(--text-1);">Deseja realmente desligar o SquareOS?</p>
+    <div style="display:flex; gap:10px;">
+      <button class="tbtn" id="shutdown-cancel">Cancelar</button>
+      <button class="btn-primary" id="shutdown-yes" style="background:linear-gradient(135deg,#ff5f56,#ff8f56);">Desligar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shutdown screen -->
+<div class="lock-screen" id="shutdown-screen" style="background:#000;">
+  <div class="boot-mark"><svg viewBox="0 0 64 64" fill="none"><rect x="8" y="8" width="48" height="48" rx="14" stroke="#555" stroke-width="3"/></svg></div>
+  <div class="boot-label" style="color:#555;">SquareOS foi desligado</div>
+  <button class="btn-primary" id="restart-btn" style="margin-top:10px;">Ligar novamente</button>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   App registry — id, label, icon (inline SVG), window target
+   ============================================================ */
+const ICONS = {
+  files: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+  terminal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  store: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+  code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+  calc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  intelligence: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5c0 2 1 3 1 5v2a4 4 0 0 0 8 0v-2c0-2 1-3 1-5a5 5 0 0 0-5-5z"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  rede: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  shutdown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>',
+  folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+  file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+};
+
+const APPS = [
+  { id:'files', label:'Finder' },
+  { id:'terminal', label:'Terminal' },
+  { id:'intelligence', label:'Lura' },
+  { id:'calc', label:'Calculadora' },
+  { id:'mail', label:'Mail' },
+  { id:'code', label:'Ecapi Code' },
+  { id:'store', label:'Store' },
+  { id:'search', label:'SIS' },
+  { id:'rede', label:'Rede' },
+  { id:'settings', label:'Configurações' },
+];
+
+const DOCK_APPS = ['files','terminal','intelligence','mail','calc','code','store','settings'];
+
+const WALLPAPERS = [
+  'https://images.unsplash.com/photo-1502790671504-542ad42d5189?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600&auto=format&fit=crop',
+];
+
+/* ============================================================
+   Persisted state
+   ============================================================ */
+const store = {
+  get(k, fallback){ try{ const v = localStorage.getItem('sqos:'+k); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } },
+  set(k, v){ try{ localStorage.setItem('sqos:'+k, JSON.stringify(v)); }catch(e){} }
+};
+
+let state = {
+  theme: store.get('theme','dark'),
+  accent: store.get('accent', ['#8B7CFF','#FF7CD4']),
+  wallpaper: store.get('wallpaper', WALLPAPERS[0]),
+};
+
+function applyTheme(){
+  document.body.setAttribute('data-theme', state.theme);
+  document.documentElement.style.setProperty('--accent', state.accent[0]);
+  document.documentElement.style.setProperty('--accent-2', state.accent[1]);
+  document.documentElement.style.setProperty('--accent-soft', state.accent[0]+'2e');
+  document.getElementById('wallpaper').style.backgroundImage = `url('${state.wallpaper}')`;
+}
+applyTheme();
+
+/* ============================================================
+   Boot sequence
+   ============================================================ */
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('boot').classList.add('hide'), 1100);
+});
+
+/* ============================================================
+   Clock
+   ============================================================ */
+function tickClock(){
+  const d = new Date();
+  const time = d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('clock').textContent = time;
+  const lockClock = document.getElementById('lock-clock');
+  if(lockClock) lockClock.textContent = time;
+  const lockDate = document.getElementById('lock-date');
+  if(lockDate) lockDate.textContent = d.toLocaleDateString('pt-BR',{weekday:'long', day:'numeric', month:'long'});
+}
+tickClock(); setInterval(tickClock, 1000);
+
+/* ============================================================
+   Toasts
+   ============================================================ */
+function toast(msg){
+  const stack = document.getElementById('toast-stack');
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  stack.appendChild(el);
+  setTimeout(() => { el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 2400);
+}
+
+/* ============================================================
+   Desktop icons
+   ============================================================ */
+const DESKTOP_ICON_LAYOUT = ['files','terminal','intelligence','settings','code','store'];
+const desktopEl = document.getElementById('desktop');
+DESKTOP_ICON_LAYOUT.forEach((id,i) => {
+  const app = APPS.find(a=>a.id===id); if(!app) return;
+  const col = Math.floor(i/5), row = i%5;
+  const div = document.createElement('div');
+  div.className = 'dicon'; div.dataset.app = id;
+  div.style.left = (18 + col*98) + 'px';
+  div.style.top = (12 + row*100) + 'px';
+  div.innerHTML = `<div class="glyph">${ICONS[id]}</div><span>${app.label}</span>`;
+  desktopEl.appendChild(div);
+});
+
+document.querySelectorAll('.dicon').forEach(icon => {
+  let dragging=false, sx=0, sy=0, ox=0, oy=0, moved=false;
+  icon.addEventListener('mousedown', e => {
+    document.querySelectorAll('.dicon.selected').forEach(d=>d!==icon && d.classList.remove('selected'));
+    icon.classList.add('selected');
+    dragging = true; moved=false; sx=e.clientX; sy=e.clientY;
+    ox = icon.offsetLeft; oy = icon.offsetTop;
+  });
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    const dx = e.clientX-sx, dy = e.clientY-sy;
+    if(Math.abs(dx)>3||Math.abs(dy)>3) moved = true;
+    if(moved){
+      icon.style.left = Math.max(0, ox+dx) + 'px';
+      icon.style.top = Math.max(0, oy+dy) + 'px';
+    }
+  });
+  document.addEventListener('mouseup', () => { dragging=false; });
+  icon.addEventListener('dblclick', () => openApp(icon.dataset.app));
+});
+document.getElementById('desktop').addEventListener('mousedown', e => {
+  if(e.target.id==='desktop') document.querySelectorAll('.dicon.selected').forEach(d=>d.classList.remove('selected'));
+});
+
+/* ============================================================
+   Dock + Launcher
+   ============================================================ */
+const dockEl = document.getElementById('dock');
+DOCK_APPS.forEach(id => {
+  const app = APPS.find(a=>a.id===id); if(!app) return;
+  const btn = document.createElement('button');
+  btn.className = 'dock-icon'; btn.dataset.app = id; btn.title = app.label;
+  btn.innerHTML = ICONS[id];
+  btn.addEventListener('click', () => openApp(id));
+  dockEl.appendChild(btn);
+});
+const sep = document.createElement('div'); sep.className='dock-sep'; dockEl.appendChild(sep);
+const launcherBtn = document.createElement('button');
+launcherBtn.className = 'dock-icon launcher'; launcherBtn.title = 'Aplicativos';
+launcherBtn.innerHTML = ICONS.grid;
+launcherBtn.addEventListener('click', toggleLauncher);
+dockEl.appendChild(launcherBtn);
+
+const launcherGrid = document.getElementById('launcher-grid');
+function renderLauncher(filter=''){
+  launcherGrid.innerHTML='';
+  APPS.filter(a=>a.label.toLowerCase().includes(filter.toLowerCase())).forEach(app => {
+    const item = document.createElement('div');
+    item.className='launcher-item';
+    item.innerHTML = `<div class="glyph">${ICONS[app.id]}</div><span>${app.label}</span>`;
+    item.addEventListener('click', () => { openApp(app.id); toggleLauncher(false); });
+    launcherGrid.appendChild(item);
+  });
+}
+renderLauncher();
+document.getElementById('launcher-search').addEventListener('input', e => renderLauncher(e.target.value));
+
+function toggleLauncher(force){
+  const el = document.getElementById('launcher');
+  const open = force===undefined ? !el.classList.contains('open') : force;
+  el.classList.toggle('open', open);
+  if(open) document.getElementById('launcher-search').focus();
+}
+document.addEventListener('click', e => {
+  const launcher = document.getElementById('launcher');
+  if(launcher.classList.contains('open') && !launcher.contains(e.target) && !launcherBtn.contains(e.target)) toggleLauncher(false);
+});
+document.getElementById('brand-menu').addEventListener('click', toggleLauncher);
+
+/* ============================================================
+   Notifications panel
+   ============================================================ */
+const notifPanel = document.getElementById('notif-panel');
+document.getElementById('notif-toggle').addEventListener('click', e => { e.stopPropagation(); notifPanel.classList.toggle('open'); });
+document.addEventListener('click', e => {
+  if(notifPanel.classList.contains('open') && !notifPanel.contains(e.target) && e.target.id!=='notif-toggle') notifPanel.classList.remove('open');
+});
+
+/* ============================================================
+   Context menu
+   ============================================================ */
+const ctxMenu = document.getElementById('ctx-menu');
+document.getElementById('desktop').addEventListener('contextmenu', e => {
+  e.preventDefault();
+  ctxMenu.style.left = e.clientX+'px'; ctxMenu.style.top = e.clientY+'px';
+  ctxMenu.classList.add('open');
+});
+document.addEventListener('click', () => ctxMenu.classList.remove('open'));
+ctxMenu.addEventListener('click', e => {
+  const action = e.target.closest('.ctx-item')?.dataset.action;
+  if(action==='refresh') toast('Área de trabalho atualizada');
+  if(action==='newfolder') toast('Pasta criada na área de trabalho');
+  if(action==='wallpaper'){ openApp('settings'); switchSettingsTab('s-wallpaper'); }
+  if(action==='settings') openApp('settings');
+});
+
+/* ============================================================
+   Window manager
+   ============================================================ */
+let zTop = 100;
+const openApps = new Set();
+
+function focusWindow(win){
+  zTop += 1; win.style.zIndex = zTop;
+}
+
+function openApp(id){
+  const win = document.getElementById('win-'+id);
+  if(!win){ toast('Aplicativo indisponível'); return; }
+  win.classList.add('active');
+  win.style.display = 'flex';
+  focusWindow(win);
+  openApps.add(id);
+  updateDockRunning();
+  if(id==='files') renderFiles();
+}
+function closeApp(win){
+  const id = win.dataset.app;
+  win.classList.remove('active'); win.style.display='none';
+  openApps.delete(id); updateDockRunning();
+}
+function updateDockRunning(){
+  document.querySelectorAll('.dock-icon[data-app]').forEach(btn => {
+    btn.classList.toggle('running', openApps.has(btn.dataset.app));
+  });
+}
+
+document.querySelectorAll('.window').forEach(win => {
+  const header = win.querySelector('.win-header');
+  const closeBtn = win.querySelector('.wctl.close');
+  const minBtn = win.querySelector('.wctl.min');
+  const maxBtn = win.querySelector('.wctl.max');
+  const handle = win.querySelector('.resize-handle');
+  let isMax = false, prevRect = null;
+
+  win.addEventListener('mousedown', () => focusWindow(win));
+
+  closeBtn && closeBtn.addEventListener('click', () => closeApp(win));
+  minBtn && minBtn.addEventListener('click', () => { win.classList.remove('active'); win.style.display='none'; toast('Janela minimizada'); });
+  maxBtn && maxBtn.addEventListener('click', () => {
+    if(!isMax){
+      prevRect = { top:win.style.top, left:win.style.left, width:win.style.width, height:win.style.height };
+      win.style.top='34px'; win.style.left='0px'; win.style.width='100vw'; win.style.height='calc(100vh - 34px)';
+    } else if(prevRect){
+      win.style.top=prevRect.top; win.style.left=prevRect.left; win.style.width=prevRect.width; win.style.height=prevRect.height;
+    }
+    isMax = !isMax;
+  });
+
+  if(header){
+    let dragging=false, sx=0, sy=0, ox=0, oy=0;
+    header.addEventListener('mousedown', e => {
+      if(e.target.closest('.wctl')) return;
+      if(isMax) return;
+      dragging=true; sx=e.clientX; sy=e.clientY; ox=win.offsetLeft; oy=win.offsetTop;
+      focusWindow(win);
+    });
+    document.addEventListener('mousemove', e => {
+      if(!dragging) return;
+      win.style.left = Math.max(0, ox + (e.clientX-sx)) + 'px';
+      win.style.top = Math.max(34, oy + (e.clientY-sy)) + 'px';
+    });
+    document.addEventListener('mouseup', () => dragging=false);
+  }
+
+  if(handle){
+    let resizing=false, sx=0, sy=0, ow=0, oh=0;
+    handle.addEventListener('mousedown', e => {
+      resizing=true; sx=e.clientX; sy=e.clientY; ow=win.offsetWidth; oh=win.offsetHeight;
+      e.stopPropagation();
+    });
+    document.addEventListener('mousemove', e => {
+      if(!resizing) return;
+      win.style.width = Math.max(320, ow + (e.clientX-sx)) + 'px';
+      win.style.height = Math.max(220, oh + (e.clientY-sy)) + 'px';
+    });
+    document.addEventListener('mouseup', () => resizing=false);
+  }
+});
+
+/* ============================================================
+   Virtual file system (Finder + Terminal share this)
+   ============================================================ */
+let vfs = store.get('vfs', {
+  type:'folder', name:'root',
+  children: {
+    'Desktop': { type:'folder', name:'Desktop', children:{} },
+    'Documents': { type:'folder', name:'Documents', children:{
+      'bem-vindo.txt': { type:'file', name:'bem-vindo.txt', content:'Bem-vindo ao SquareOS!\n\nEste é um arquivo de texto de exemplo. Você pode editá-lo, criar novos arquivos e pastas, e tudo é salvo localmente no seu navegador.' }
+    }},
+    'Downloads': { type:'folder', name:'Downloads', children:{} },
+    'Pictures': { type:'folder', name:'Pictures', children:{} },
+  }
+});
+function saveVFS(){ store.set('vfs', vfs); }
+
+let currentPath = ['root'];
+function resolvePath(path){
+  let node = vfs;
+  for(let i=1;i<path.length;i++){ node = node.children[path[i]]; if(!node) return null; }
+  return node;
+}
+
+function renderFiles(){
+  const node = resolvePath(currentPath);
+  const grid = document.getElementById('file-grid');
+  const crumbs = document.getElementById('files-crumbs');
+  const backBtn = document.getElementById('files-back');
+  backBtn.disabled = currentPath.length<=1;
+
+  crumbs.innerHTML='';
+  currentPath.forEach((seg,i) => {
+    const label = seg==='root' ? 'Início' : seg;
+    const span = document.createElement('span');
+    span.className='crumb'; span.textContent = label;
+    span.addEventListener('click', () => { currentPath = currentPath.slice(0,i+1); renderFiles(); });
+    crumbs.appendChild(span);
+    if(i<currentPath.length-1){ const sep=document.createElement('span'); sep.textContent='/'; sep.style.opacity=.4; crumbs.appendChild(sep); }
+  });
+
+  grid.innerHTML='';
+  if(!node || !node.children || Object.keys(node.children).length===0){
+    grid.innerHTML = '<div class="empty-state">Esta pasta está vazia</div>';
+    return;
+  }
+  Object.values(node.children).forEach(item => {
+    const el = document.createElement('div');
+    el.className='fitem';
+    let glyphClass='file', icon=ICONS.file;
+    if(item.type==='folder'){ glyphClass='folder'; icon=ICONS.folder; }
+    else if(item.type==='image'){ glyphClass='img'; icon=ICONS.image; }
+    el.innerHTML = `<div class="glyph ${glyphClass}">${icon}</div><span>${item.name}</span>`;
+    el.addEventListener('dblclick', () => {
+      if(item.type==='folder'){ currentPath = currentPath.concat(item.name); renderFiles(); }
+      else if(item.type==='image'){ openImage(item); }
+      else { openEditor(item); }
+    });
+    el.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      if(confirm(`Excluir "${item.name}"?`)){ delete node.children[item.name]; saveVFS(); renderFiles(); }
+    });
+    grid.appendChild(el);
+  });
+}
+document.getElementById('files-back').addEventListener('click', () => { if(currentPath.length>1){ currentPath.pop(); renderFiles(); } });
+document.getElementById('files-newfolder').addEventListener('click', () => {
+  const name = prompt('Nome da nova pasta:'); if(!name) return;
+  const node = resolvePath(currentPath);
+  node.children[name] = { type:'folder', name, children:{} };
+  saveVFS(); renderFiles();
+});
+document.getElementById('files-newfile').addEventListener('click', () => {
+  const name = prompt('Nome do novo arquivo (ex: notas.txt):'); if(!name) return;
+  const node = resolvePath(currentPath);
+  node.children[name] = { type:'file', name, content:'' };
+  saveVFS(); renderFiles();
+  openEditor(node.children[name]);
+});
+document.getElementById('files-upload').addEventListener('change', e => {
+  const file = e.target.files[0]; if(!file) return;
+  const node = resolvePath(currentPath);
+  const reader = new FileReader();
+  const isImage = file.type.startsWith('image/');
+  reader.onload = () => {
+    if(isImage){ node.children[file.name] = { type:'image', name:file.name, dataUrl: reader.result }; }
+    else { node.children[file.name] = { type:'file', name:file.name, content: typeof reader.result==='string' ? reader.result : '' }; }
+    saveVFS(); renderFiles(); toast(`"${file.name}" enviado`);
+  };
+  if(isImage) reader.readAsDataURL(file); else reader.readAsText(file);
+  e.target.value='';
+});
+
+/* Editor */
+let editingItem = null;
+function openEditor(item){
+  editingItem = item;
+  document.getElementById('editor-filename').textContent = item.name;
+  document.getElementById('editor-text-wrap').style.display='flex';
+  document.getElementById('editor-image-wrap').style.display='none';
+  document.getElementById('editor-text').value = item.content || '';
+  openApp('editor');
+}
+function openImage(item){
+  editingItem = null;
+  document.getElementById('editor-filename').textContent = item.name;
+  document.getElementById('editor-text-wrap').style.display='none';
+  document.getElementById('editor-image-wrap').style.display='flex';
+  document.getElementById('editor-image').src = item.dataUrl;
+  openApp('editor');
+}
+document.getElementById('editor-save').addEventListener('click', () => {
+  if(editingItem){ editingItem.content = document.getElementById('editor-text').value; saveVFS(); toast('Arquivo salvo'); }
+});
+document.getElementById('editor-cancel').addEventListener('click', () => closeApp(document.getElementById('win-editor')));
+
+/* ============================================================
+   Terminal
+   ============================================================ */
+const termOut = document.getElementById('term-output');
+const termInput = document.getElementById('term-input');
+let termCwd = ['root'];
+let termHistory = []; let histIdx = 0;
+
+function printLine(html){ const div=document.createElement('div'); div.className='term-line'; div.innerHTML=html; termOut.appendChild(div); termOut.scrollTop=termOut.scrollHeight; }
+function termPromptStr(){ return `square@nebula ${termCwd.length>1 ? '~/'+termCwd.slice(1).join('/') : '~'} > `; }
+function refreshPrompt(){ document.getElementById('term-prompt-live').textContent = termPromptStr(); }
+
+const ASCII = `   .-.\n  (o.o)\n   |=|\n  __|__\n //.=|=.\\\\ \n// .=|=. \\\\\n\\ ). .( /\n  '=.|.='\n    .:.`;
+
+function bootTerminal(){
+  termOut.innerHTML='';
+  printLine(`<pre class="term-ascii">${ASCII}</pre>`);
+  printLine('<span class="term-accent">SquareOS v2.0 [Nebula Build]</span>');
+  printLine('Sessão iniciada. Digite <span class="term-accent">help</span> para ver os comandos.');
+  refreshPrompt();
+}
+bootTerminal();
+
+const termCommands = {
+  help: () => "Comandos: help, clear, whoami, uname, ls, cd, pwd, mkdir, touch, cat, date, echo, neofetch, theme [dark|light], exit",
+  clear: () => { termOut.innerHTML=''; return undefined; },
+  whoami: () => 'square',
+  uname: () => 'SquareOS 6.6.15-nebula x86_64',
+  pwd: () => '/' + (termCwd.length>1 ? termCwd.slice(1).join('/') : ''),
+  date: () => new Date().toLocaleString('pt-BR'),
+  echo: (args) => args.join(' '),
+  ls: () => {
+    const node = resolvePath(termCwd);
+    if(!node || !node.children) return '';
+    const names = Object.values(node.children).map(i => i.type==='folder' ? `<span class="term-accent">${i.name}/</span>` : i.name);
+    return names.join('  ') || '(vazio)';
+  },
+  cd: (args) => {
+    if(!args[0] || args[0]==='~'){ termCwd=['root']; refreshPrompt(); return ''; }
+    if(args[0]==='..'){ if(termCwd.length>1) termCwd.pop(); refreshPrompt(); return ''; }
+    const node = resolvePath(termCwd);
+    const target = node.children[args[0]];
+    if(target && target.type==='folder'){ termCwd = termCwd.concat(args[0]); refreshPrompt(); return ''; }
+    return `<span class="term-error">cd: pasta não encontrada: ${args[0]}</span>`;
+  },
+  mkdir: (args) => {
+    if(!args[0]) return `<span class="term-error">uso: mkdir [nome]</span>`;
+    const node = resolvePath(termCwd);
+    node.children[args[0]] = { type:'folder', name:args[0], children:{} };
+    saveVFS();
+    return `pasta "${args[0]}" criada`;
+  },
+  touch: (args) => {
+    if(!args[0]) return `<span class="term-error">uso: touch [nome]</span>`;
+    const node = resolvePath(termCwd);
+    node.children[args[0]] = { type:'file', name:args[0], content:'' };
+    saveVFS();
+    return `arquivo "${args[0]}" criado`;
+  },
+  cat: (args) => {
+    if(!args[0]) return `<span class="term-error">uso: cat [arquivo]</span>`;
+    const node = resolvePath(termCwd);
+    const f = node.children[args[0]];
+    if(!f || f.type!=='file') return `<span class="term-error">arquivo não encontrado: ${args[0]}</span>`;
+    return (f.content || '(vazio)').replace(/</g,'&lt;');
+  },
+  theme: (args) => {
+    if(args[0]==='dark' || args[0]==='light'){ state.theme=args[0]; store.set('theme',state.theme); applyTheme(); return `tema alterado para ${args[0]}`; }
+    return `uso: theme [dark|light]`;
+  },
+  neofetch: () => `<span class="term-accent">square@nebula</span>\n-------------\nOS: <span class="term-accent">SquareOS v2.0 (Nebula)</span>\nHost: SQUARE-T45\nKernel: 6.6.15-nebula\nShell: zsh-like 5.9\nCPU: 8-core @ 3.20GHz\nMemory: 8192MiB`,
+  exit: () => { closeApp(document.getElementById('win-terminal')); return undefined; },
+};
+
+termInput.addEventListener('keydown', e => {
+  if(e.key==='Enter'){
+    const raw = termInput.value.trim();
+    termInput.value='';
+    if(!raw){ printLine(''); return; }
+    printLine(`<span class="term-accent">${termPromptStr()}</span>${raw}`);
+    termHistory.push(raw); histIdx = termHistory.length;
+    const [cmd, ...args] = raw.split(' ');
+    const fn = termCommands[cmd];
+    if(fn){ const out = fn(args); if(out!==undefined) printLine(out); }
+    else printLine(`<span class="term-error">zsh: comando não encontrado: ${cmd}</span> — digite 'help'`);
+  }
+  if(e.key==='ArrowUp'){ if(histIdx>0) histIdx--; termInput.value = termHistory[histIdx] || ''; e.preventDefault(); }
+  if(e.key==='ArrowDown'){ if(histIdx<termHistory.length-1){ histIdx++; termInput.value = termHistory[histIdx]; } else { histIdx=termHistory.length; termInput.value=''; } e.preventDefault(); }
+});
+
+/* ============================================================
+   Settings
+   ============================================================ */
+function switchSettingsTab(id){
+  document.querySelectorAll('.s-tab').forEach(t => t.style.display = t.id===id ? 'block' : 'none');
+  document.querySelectorAll('.snav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===id));
+}
+document.getElementById('settings-nav').addEventListener('click', e => {
+  const btn = e.target.closest('.snav-btn'); if(!btn) return;
+  switchSettingsTab(btn.dataset.tab);
+});
+
+document.getElementById('theme-swatches').addEventListener('click', e => {
+  const sw = e.target.closest('.swatch'); if(!sw) return;
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+  sw.classList.add('active');
+  state.theme = sw.dataset.theme; store.set('theme', state.theme); applyTheme();
+});
+document.getElementById('accent-dots').addEventListener('click', e => {
+  const dot = e.target.closest('.adot'); if(!dot) return;
+  document.querySelectorAll('.adot').forEach(d=>d.classList.remove('active'));
+  dot.classList.add('active');
+  state.accent = dot.dataset.accent.split(','); store.set('accent', state.accent); applyTheme();
+});
+document.querySelectorAll('.toggle').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
+
+const wallGrid = document.getElementById('wall-grid');
+WALLPAPERS.forEach(url => {
+  const div = document.createElement('div');
+  div.className = 'wall-thumb' + (url===state.wallpaper ? ' active':'');
+  div.style.backgroundImage = `url('${url}')`;
+  div.addEventListener('click', () => {
+    document.querySelectorAll('.wall-thumb').forEach(w=>w.classList.remove('active'));
+    div.classList.add('active');
+    state.wallpaper = url; store.set('wallpaper', url); applyTheme();
+    toast('Papel de parede atualizado');
+  });
+  wallGrid.appendChild(div);
+});
+document.getElementById('apply-wallpaper').addEventListener('click', () => {
+  const url = document.getElementById('wallpaper-url').value.trim();
+  if(!url) return toast('Informe uma URL válida');
+  state.wallpaper = url; store.set('wallpaper', url); applyTheme();
+  toast('Papel de parede atualizado');
+});
+document.getElementById('save-user').addEventListener('click', () => toast('Perfil atualizado'));
+
+/* ============================================================
+   Calculator
+   ============================================================ */
+const calcGrid = document.getElementById('calc-grid');
+const calcDisplay = document.getElementById('calc-display');
+const CALC_KEYS = [
+  ['C','','op'],['±','','op'],['%','','op'],['÷','','op'],
+  ['7','','' ],['8','',''],['9','',''],['×','','op'],
+  ['4','','' ],['5','',''],['6','',''],['-','','op'],
+  ['1','','' ],['2','',''],['3','',''],['+','','op'],
+  ['0','wide',''],['.','',''],['=','eq','']
+];
+let calcExpr = '';
+CALC_KEYS.forEach(([label,cls]) => {
+  const btn = document.createElement('button');
+  btn.className = 'calc-key' + (cls?' '+cls:'');
+  btn.textContent = label;
+  btn.addEventListener('click', () => handleCalcKey(label));
+  calcGrid.appendChild(btn);
+});
+function handleCalcKey(k){
+  if(k==='C'){ calcExpr=''; calcDisplay.textContent='0'; return; }
+  if(k==='='){
+    try{
+      const safe = calcExpr.replace(/×/g,'*').replace(/÷/g,'/');
+      const result = Function(`"use strict"; return (${safe||0})`)();
+      calcDisplay.textContent = String(result);
+      calcExpr = String(result);
+    }catch(e){ calcDisplay.textContent='Erro'; calcExpr=''; }
+    return;
+  }
+  if(k==='±'){ calcExpr = calcExpr.startsWith('-') ? calcExpr.slice(1) : '-'+calcExpr; calcDisplay.textContent = calcExpr||'0'; return; }
+  calcExpr += k;
+  calcDisplay.textContent = calcExpr;
+}
+
+/* ============================================================
+   Shutdown / lock
+   ============================================================ */
+document.getElementById('shutdown-cancel').addEventListener('click', () => closeApp(document.getElementById('win-shutdown')));
+document.getElementById('shutdown-yes').addEventListener('click', () => {
+  closeApp(document.getElementById('win-shutdown'));
+  document.getElementById('shutdown-screen').classList.add('open');
+});
+document.getElementById('restart-btn').addEventListener('click', () => location.reload());
+
+/* ============================================================
+   Global shortcuts
+   ============================================================ */
+document.addEventListener('keydown', e => {
+  if(e.ctrlKey && e.key.toLowerCase()==='k'){ e.preventDefault(); toggleLauncher(); }
+});
+
+})();
+</script>
+</body>
+</html>

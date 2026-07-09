@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Início - Square OS</title>
+    <link rel="icon" href="assets/icones/icones 1/logo.png" type="image/png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* Reset e Variáveis */
+      :root {
+        --bg-dark: #0d0d0d;
+        --bg-light: #f5f5f5;
+        --text-dark: #1a1a1a;
+        --text-light: #f5f5f5;
+        --nav-dark: #111;
+        --nav-light: #fff;
+        --card-dark: #1a1a1a;
+        --card-light: #fff;
+        --border-dark: #2c2c2c;
+        --border-light: #ccc;
+        --primary-purple: #8c52ff;
+        --primary-purple-hover: #a46dff;
+        --primary-purple-darker: #6e3fd6;
+        --red-delete: #e74c3c;
+        --red-delete-hover: #c0392b;
+        --green-online: #2ecc71;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-light);
+        padding-top: 64px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      body.light {
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+      }
+
+      /* Navegação */
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background-color: var(--nav-dark);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        border-bottom: 1px solid var(--border-dark);
+        z-index: 1000;
+      }
+      body.light .nav {
+        background-color: var(--nav-light);
+        border-bottom: 1px solid var(--border-light);
+      }
+      .logo {
+        height: 40px;
+      }
+      .actions {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+      .user-plan {
+        font-size: 14px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 6px;
+        background-color: var(--border-dark);
+        color: #bbb;
+      }
+      .user-plan.pago {
+        background: linear-gradient(90deg, var(--primary-purple), var(--primary-purple-hover));
+        color: white;
+      }
+      .btn {
+        background-color: var(--primary-purple);
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn:hover {
+        background-color: var(--primary-purple-hover);
+        transform: scale(1.05);
+      }
+      .toggle-theme {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: var(--text-light);
+        transition: transform 0.2s;
+      }
+      body.light .toggle-theme {
+        color: var(--text-dark);
+      }
+      .toggle-theme:hover {
+        transform: scale(1.2);
+      }
+      .btn.light-purple {
+        background-color: var(--primary-purple);
+        color: white;
+      }
+      .btn.light-purple:hover {
+        background-color: var(--primary-purple-hover);
+      }
+      .btn.red {
+        background-color: var(--red-delete);
+      }
+      .btn.red:hover {
+        background-color: var(--red-delete-hover);
+      }
+
+      /* Conteúdo Principal */
+      .container {
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: auto;
+      }
+      h1 {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: var(--text-light);
+      }
+      body.light h1 {
+        color: var(--text-dark);
+      }
+      .search-bar {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .search-bar input {
+        width: 80%;
+        max-width: 400px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        background-color: #333;
+        color: white;
+      }
+      body.light .search-bar input {
+        background-color: #eee;
+        color: #333;
+      }
+
+      /* Máquinas Virtuais */
+      .maquinas {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+      }
+      .maquina {
+        background-color: var(--card-dark);
+        border: 1px solid var(--border-dark);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        transition: transform 0.2s, border-color 0.2s;
+      }
+      body.light .maquina {
+        background-color: var(--card-light);
+        border: 1px solid var(--border-light);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .maquina:hover {
+        transform: translateY(-6px);
+        border-color: var(--primary-purple);
+      }
+      .maquina img {
+        width: 60px;
+        margin-bottom: 10px;
+      }
+      .maquina p {
+        margin: 6px 0;
+        font-weight: 500;
+        color: #ccc;
+      }
+      body.light .maquina p {
+        color: #333;
+      }
+      .status {
+        font-size: 13px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+      .online {
+        background-color: var(--green-online);
+        color: white;
+      }
+      .offline {
+        background-color: var(--red-delete);
+        color: white;
+      }
+      .maquina .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .maquina .btn-group .btn {
+        width: auto;
+      }
+      
+      /* Modal do Questionário */
+      .survey-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      .survey-overlay.active {
+        display: flex;
+        opacity: 1;
+      }
+      .survey-container {
+        background: rgba(20, 20, 20, 0.9);
+        border-radius: 12px;
+        padding: 3rem;
+        max-width: 600px;
+        width: 90%;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        position: relative;
+        animation: fadeInUp 0.8s forwards;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+      .survey-container h3 {
+        font-size: 1.8rem;
+        text-align: center;
+        color: var(--primary-purple);
+        margin-bottom: 1rem;
+      }
+      .survey-step {
+        display: none;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .survey-step.active {
+        display: flex;
+      }
+      .survey-option {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.3s;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+      .survey-option:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+      .survey-option.selected {
+        background: rgba(140, 82, 255, 0.2);
+        border: 2px solid var(--primary-purple);
+        transform: scale(1.02);
+      }
+      .survey-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+      }
+      .survey-progress-bar {
+        width: 100%;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        margin-top: 1rem;
+      }
+      .survey-progress {
+        height: 100%;
+        width: 0%;
+        background: var(--primary-purple);
+        border-radius: 5px;
+        transition: width 0.5s ease-in-out;
+      }
+      .survey-close-btn {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        font-size: 1.5rem;
+        color: #777;
+        cursor: pointer;
+        transition: color 0.3s;
+      }
+      .survey-close-btn:hover {
+        color: var(--primary-purple);
+      }
+
+      /* Animações */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="survey-modal" class="survey-overlay">
+      <div class="survey-container">
+        <i
+          class="fas fa-times survey-close-btn"
+          onclick="closeSurvey()"
+        ></i>
+
+        <div class="survey-step active" id="step-1">
+          <h3>O que te trouxe até o Square OS?</h3>
+          <div class="survey-options">
+            <div class="survey-option" data-value="curiosity">Curiosidade</div>
+            <div class="survey-option" data-value="development">
+              Desenvolvimento de software
+            </div>
+            <div class="survey-option" data-value="productivity">
+              Produtividade / Trabalho
+            </div>
+            <div class="survey-option" data-value="education">
+              Estudo / Educação
+            </div>
+          </div>
+        </div>
+
+        <div class="survey-step" id="step-2">
+          <h3>Qual característica mais te interessa?</h3>
+          <div class="survey-options">
+            <div class="survey-option" data-value="cloud">Cloud Integrada</div>
+            <div class="survey-option" data-value="vms">
+              Máquinas Virtuais (VMs)
+            </div>
+            <div class="survey-option" data-value="store">Loja de Apps</div>
+            <div class="survey-option" data-value="code">
+              Linguagem de Código Própria
+            </div>
+          </div>
+        </div>
+
+        <div class="survey-step" id="step-3">
+          <h3>Com qual frequência você usaria o sistema?</h3>
+          <div class="survey-options">
+            <div class="survey-option" data-value="daily">Diariamente</div>
+            <div class="survey-option" data-value="weekly">Semanalmente</div>
+            <div class="survey-option" data-value="monthly">Mensalmente</div>
+            <div class="survey-option" data-value="occasionally">
+              Ocasionalmente
+            </div>
+          </div>
+        </div>
+
+        <div class="survey-step" id="step-4">
+          <h3>Como você conheceu o Square OS?</h3>
+          <div class="survey-options">
+            <div class="survey-option" data-value="social-media">
+              Mídias Sociais
+            </div>
+            <div class="survey-option" data-value="friend">
+              Indicação de um amigo
+            </div>
+            <div class="survey-option" data-value="article">
+              Artigo / Notícia
+            </div>
+            <div class="survey-option" data-value="search">
+              Pesquisa online
+            </div>
+          </div>
+        </div>
+
+        <div class="survey-progress-bar">
+          <div class="survey-progress" id="progress-bar"></div>
+        </div>
+        <div class="survey-navigation">
+          <button class="btn" id="prev-btn" disabled>Voltar</button>
+          <button class="btn" id="next-btn">Próximo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <img class="logo" src="assets/icones/icones 1/logo.png" alt="Square OS" />
+      <div class="actions">
+        <button class="btn" onclick="openSurvey()">
+          Responder Questionário
+        </button>
+        <span
+          class="user-plan {% if usuario_plano == 'pago' %}pago{% else %}gratuito{% endif %}"
+        >
+          {% if usuario_plano == 'pago' %} Pago {% else %} Gratuito {% endif %}
+        </span>
+        <button class="toggle-theme" onclick="toggleTheme()">🌙</button>
+        <form action="{{ url_for('new_maquina') }}" method="get">
+          <button type="submit" class="btn light-purple">
+            + Criar Máquina
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1>Minhas Máquinas</h1>
+
+      <div class="search-bar">
+        <input
+          type="text"
+          id="search"
+          placeholder="🔍 Buscar máquina..."
+          onkeyup="filterMachines()"
+        />
+      </div>
+
+      <div class="maquinas" id="maquinas-list">
+        {% for m in maquinas %}
+        <div class="maquina">
+          <img src="assets/icones/icones 1/machine.png" alt="Máquina" />
+          <p><strong>{{ m.maquina_nome }}</strong></p>
+          <p class="status {% if m.online %}online{% else %}offline{% endif %}">
+            {% if m.online %} Online {% else %} Offline {% endif %}
+          </p>
+          <p>
+            ⚡ CPU: {{ m.cpu }} | 🖥 RAM: {{ m.ram }} GB
+          </p>
+          <p>💾 Disco: 5 GB</p>
+          <div class="btn-group">
+            <form action="{{ url_for('entrar_maquina', maquina_id=m.id) }}" method="get">
+              <button type="submit" class="btn light-purple">Entrar</button>
+            </form>
+            <form action="{{ url_for('config_maquina', maquina_id=m.id) }}" method="get">
+              <button type="submit" class="btn">Configurações</button>
+            </form>
+            <form
+              action="{{ url_for('deletar_maquina', maquina_id=m.id) }}"
+              method="post"
+              onsubmit="return confirmDelete('{{ m.maquina_nome }}')"
+            >
+              <button type="submit" class="btn red">Excluir</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script>
+      // Lógica de alternância de tema
+      function toggleTheme() {
+        document.body.classList.toggle("light");
+        const themeBtn = document.querySelector(".toggle-theme");
+        themeBtn.textContent = document.body.classList.contains("light")
+          ? "🌞"
+          : "🌙";
+      }
+
+      // Lógica de busca e filtro
+      function filterMachines() {
+        let input = document.getElementById("search").value.toLowerCase();
+        let machines = document.querySelectorAll(".maquina");
+        machines.forEach((m) => {
+          let name = m.querySelector("p strong").textContent.toLowerCase();
+          m.style.display = name.includes(input) ? "block" : "none";
+        });
+      }
+
+      // Lógica do modal de exclusão
+      function confirmDelete(machineName) {
+        return confirm(
+          `Tem certeza que deseja excluir a máquina "${machineName}"?`
+        );
+      }
+
+      // Lógica do Questionário (Quiz)
+      const surveyModal = document.getElementById("survey-modal");
+      const surveySteps = document.querySelectorAll(".survey-step");
+      const nextBtn = document.getElementById("next-btn");
+      const prevBtn = document.getElementById("prev-btn");
+      const progressBar = document.getElementById("progress-bar");
+      let currentStep = 0;
+      let userAnswers = {};
+
+      // Função para abrir o quiz
+      function openSurvey() {
+        surveyModal.classList.add("active");
+        updateSurvey();
+      }
+
+      // Função para fechar o quiz
+      function closeSurvey() {
+        surveyModal.classList.remove("active");
+        // Reiniciar o quiz
+        currentStep = 0;
+        userAnswers = {};
+        document.querySelectorAll(".survey-option").forEach(opt => opt.classList.remove('selected'));
+        updateSurvey();
+      }
+
+      // Atualiza o estado do quiz
+      function updateSurvey() {
+        surveySteps.forEach((step, index) => {
+          step.classList.toggle("active", index === currentStep);
+        });
+
+        prevBtn.disabled = currentStep === 0;
+        nextBtn.textContent = currentStep === surveySteps.length - 1 ? "Enviar" : "Próximo";
+
+        const currentOptions = document.querySelectorAll(`#step-${currentStep + 1} .survey-option`);
+        const isOptionSelected = [...currentOptions].some(opt => opt.classList.contains('selected'));
+        nextBtn.disabled = !isOptionSelected;
+
+        const progress = ((currentStep + 1) / surveySteps.length) * 100;
+        progressBar.style.width = `${progress}%`;
+      }
+
+      // Lógica de seleção de opções
+      document.querySelectorAll(".survey-option").forEach((option) => {
+        option.addEventListener("click", () => {
+          const currentOptions = document.querySelectorAll(
+            `#step-${currentStep + 1} .survey-option`
+          );
+          currentOptions.forEach((opt) => opt.classList.remove("selected"));
+          option.classList.add("selected");
+          
+          const questionId = `question-${currentStep + 1}`;
+          userAnswers[questionId] = option.dataset.value;
+          nextBtn.disabled = false;
+        });
+      });
+
+      // Lógica de navegação
+      nextBtn.addEventListener("click", () => {
+        if (currentStep < surveySteps.length - 1) {
+          currentStep++;
+          updateSurvey();
+        } else {
+          // Lógica de envio (simulada)
+          console.log("Respostas do usuário:", userAnswers);
+          alert("Obrigado por sua participação! Suas respostas foram enviadas.");
+          closeSurvey();
+        }
+      });
+
+      prevBtn.addEventListener("click", () => {
+        if (currentStep > 0) {
+          currentStep--;
+          updateSurvey();
+        }
+      });
+
+      // Inicialização
+      updateSurvey();
+    </script>
+  </body>
+</html>

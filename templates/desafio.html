@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Academy - Detalhes do Desafio (Final Clean)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Variáveis CSS */
+        :root {
+            --color-black-main: #000000;
+            --color-black-card: #0d0d0d;
+            --color-purple-accent: #8A2BE2;
+            --color-white-text: #F5F5F5;
+            --color-border-subtle: #1c1c1c;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        /* Estilos Base */
+        body {
+            font-family: var(--font-main);
+            background-color: var(--color-black-main);
+            color: var(--color-white-text);
+            margin: 0;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Container Principal Centralizado */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            max-width: 800px;
+            width: 100%;
+            align-items: center;
+        }
+
+        /* Título Principal */
+        .main-title {
+            font-size: 2.2em;
+            font-weight: 800;
+            color: var(--color-white-text);
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--color-purple-accent);
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        /* Estilo do Bloco (Card) */
+        .info-block {
+            background-color: var(--color-black-card);
+            border: 1px solid var(--color-border-subtle);
+            border-radius: 8px;
+            padding: 30px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-block:hover {
+            border-color: var(--color-purple-accent);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 8px rgba(138, 43, 226, 0.4);
+        }
+
+        /* Título do Bloco */
+        .info-block h2 {
+            font-size: 1.5em;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--color-purple-accent);
+            text-transform: uppercase;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        /* --- OBJETIVO --- */
+        .block-objetivo p {
+            font-size: 1.1em;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+        
+        /* --- MATERIAL (Lista Simples sem Bullet Points) --- */
+        .block-material ul {
+            list-style: none; /* Remove o marcador padrão */
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Espaçamento entre os itens */
+        }
+
+        .block-material ul li {
+            font-size: 1em;
+            line-height: 1.5;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--color-border-subtle); /* Linha divisória clean */
+        }
+
+        .block-material ul li:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        /* --- AVISOS LEGAIS --- */
+        .block-avisos p {
+            font-size: 0.95em;
+            line-height: 1.6;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        .terms-acceptance {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+
+        .terms-acceptance input[type="checkbox"] {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .terms-acceptance label {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .terms-acceptance label::before {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--color-purple-accent);
+            background-color: transparent;
+            border-radius: 3px;
+            margin-right: 10px;
+            transition: background-color 0.2s ease;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .terms-acceptance input[type="checkbox"]:checked + label::before {
+            background-color: var(--color-purple-accent);
+            border-color: var(--color-purple-accent);
+        }
+
+        /* --- BOTÃO PRÓXIMO --- */
+        .next-button {
+            display: block;
+            width: 300px; /* Largura definida para centralizar e dar destaque */
+            padding: 15px 30px;
+            margin-top: 30px;
+            background-color: var(--color-purple-accent);
+            color: var(--color-black-main);
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .next-button:hover {
+            background-color: #9932CC; /* Roxo ligeiramente mais escuro no hover */
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.6);
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .next-button {
+                width: 100%;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="main-title">DETALHES DO DESAFIO</h1>
+
+    <div class="main-container">
+
+        <div class="info-block block-objetivo">
+            <h2>OBJETIVO</h2>
+            <p>
+                REALIZE UM <strong>ATAQUE DDOS EM UM SERVIDOR ISOLADO</strong>. VOCÊ RECEBERÁ O LINK DO SITE-ALVO.
+            </p>
+            <p>
+                O DESAFIO TERMINA QUANDO O SITE <strong>FALHAR EM RESPONDER A REQUISIÇÕES GET</strong>.
+            </p>
+        </div>
+
+        <div class="info-block block-material">
+            <h2>MATERIAL</h2>
+            <ul>
+                <li>ACESSO AO SITE PARA TESTES E EXPLORAÇÃO.</li>
+                <li>CÓDIGO-FONTE DE PARTES DO SITE PARA ANÁLISE DE VULNERABILIDADES.</li>
+                <li>POSSÍVEIS CREDENCIAIS PARA A PÁGINA ADMINISTRATIVA.</li>
+                <li>TERMINAL INTERATIVO COM FERRAMENTAS DIVERSAS, LIMITADO AO USO DE <strong>LINEX E PYTHON</strong>.</li>
+                <li>O Material será entregue por partes então a responsabilidade de anotar tudo e do "HACKER".</li>
+            </ul>
+        </div>
+
+        <div class="info-block block-avisos">
+            <h2>AVISOS LEGAIS</h2>
+            <p>
+                TODAS AS AÇÕES DESTE DESAFIO OCORREM EM <strong>AMBIENTE DIGITAL CONTROLADO</strong>, COM AUTORIZAÇÃO DA SQUARE SYSTEMS. QUALQUER TENTATIVA DE REPLICAÇÃO FORA DESSE CONTEXTO <strong>NÃO É DE RESPONSABILIDADE</strong> DA SQUARE SYSTEMS NEM DOS CRIADORES DO SISTEMA.
+            </p>
+            
+            <div class="terms-acceptance">
+                <input type="checkbox" id="aceite-termos" name="aceite-termos">
+                <label for="aceite-termos">
+                    Concordo com os avisos e assumo total responsabilidade por qualquer tentativa de replicação.
+                </label>
+            </div>
+        </div>
+
+        <a href="#proximo-passo" class="next-button">PRÓXIMO</a>
+
+    </div>
+
+</body>
+</html>

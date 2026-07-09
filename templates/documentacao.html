@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação da Linguagem Linex</title>
+    <style>
+        :root {
+            --bg-color-dark: #121212;
+            --bg-color-medium: #1e1e1e;
+            --bg-color-light: #2b2b2b;
+            --text-color-light: #e0e0e0;
+            --text-color-primary: #4dc0e7;
+            --border-color: #333;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2em;
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-light);
+            transition: background-color 0.3s ease;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: var(--bg-color-medium);
+            padding: 2.5em;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        h1, h2, h3 {
+            color: var(--text-color-primary);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5em;
+            margin-top: 2em;
+        }
+        h1 {
+            border-bottom: 4px solid var(--text-color-primary);
+            font-size: 2.5em;
+        }
+        pre {
+            background-color: var(--bg-color-light);
+            border-left: 4px solid var(--text-color-primary);
+            padding: 1.5em;
+            overflow-x: auto;
+            border-radius: 6px;
+            margin-top: 1em;
+            margin-bottom: 1.5em;
+        }
+        code {
+            font-family: "Fira Code", "JetBrains Mono", "Inconsolata", monospace;
+            background-color: var(--bg-color-light);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .code-block {
+            background-color: var(--bg-color-light);
+            padding: 1.5em;
+            border-radius: 8px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        a {
+            color: var(--text-color-primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #8beaff;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 0.5em;
+        }
+        .back-button {
+            display: inline-block;
+            background-color: var(--text-color-primary);
+            color: var(--bg-color-dark);
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .back-button:hover {
+            background-color: #8beaff;
+            transform: translateY(-2px);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/ide" class="back-button">← Voltar para a IDE</a>
+        </div>
+        
+        <h1>Documentação da Linguagem Linex</h1>
+        <p>Bem-vindo à documentação oficial da linguagem de programação <strong>Linex</strong>. Criada para ser simples e poderosa, Linex permite que você execute comandos sequenciais e lógicos de forma clara e objetiva. Esta documentação é o seu guia completo para dominar a linguagem.</p>
+
+        ---
+        <h2>Sumário</h2>
+        <ul>
+            <li><a href="#intro">1. Introdução</a></li>
+            <li><a href="#sintaxe">2. Sintaxe Básica</a></li>
+            <li><a href="#comandos">3. Comandos Principais</a></li>
+            <li><a href="#bib">4. Bibliotecas Padrão</a></li>
+            <li><a href="#exemplo">5. Exemplo de Código Completo</a></li>
+        </ul>
+        
+        ---
+        <h2 id="intro">1. Introdução</h2>
+        <p><strong>O que é Linex?</strong><br>Linex é uma linguagem interpretada, ideal para automação de tarefas simples, processamento de dados e scripts. Sua filosofia de design prioriza a legibilidade e a sintaxe intuitiva, tornando-a perfeita para iniciantes em programação.</p>
+        
+        ---
+        <h2 id="sintaxe">2. Sintaxe Básica</h2>
+        <p>Todo programa Linex deve começar com o comando de inicialização. Os comandos são executados em ordem, linha por linha.</p>
+        <pre><code class="linex-code">linex init project
+
+# Seu codigo comeca aqui...
+# Cada comando em uma nova linha.
+</code></pre>
+
+        <h3>Comentários</h3>
+        <p>Use o caractere <code>#</code> para adicionar comentários e anotações. O interpretador ignora qualquer coisa após ele.</p>
+        <pre><code># Este e um comentario sobre a proxima linha.
+linex print "Iniciando o script..."</code></pre>
+
+        ---
+        <h2 id="comandos">3. Comandos Principais</h2>
+
+        <h3><code>linex print "msg"</code> | <code>linex print var</code></h3>
+        <p>Exibe uma mensagem ou o valor de uma variável. O operador <code>+</code> pode ser usado para concatenar texto e variáveis.</p>
+        <pre><code>linex print "Ola, mundo!"
+linex print "O resultado e: " + resultado</code></pre>
+
+        <h3><code>var nome = valor</code></h3>
+        <p>Declara ou atualiza uma variável. O valor pode ser uma string (entre aspas), um número, ou uma expressão de cálculo.</p>
+        <pre><code>var nome = "Miguel"
+var idade = 30
+var ano_nascimento = calc 2024 - idade</code></pre>
+        
+        <h3><code>calc expressao</code></h3>
+        <p>Realiza uma operação matemática e retorna o resultado. É frequentemente usado em conjunto com o comando <code>var</code>. A expressão pode conter variáveis e funções de bibliotecas padrão.</p>
+        <pre><code>calc 10 * 5
+var valor_final = calc (100 + 50) / 2</code></pre>
+
+        <h3><code>input variavel</code></h3>
+        <p>Lê uma linha de entrada e a armazena na variável especificada.</p>
+        <pre><code>input nome_do_usuario</code></pre>
+        
+        <h3><code>request get "url" to var_name</code></h3>
+        <p>Faz uma requisição HTTP GET para uma URL e salva o conteúdo da resposta na variável especificada.</p>
+        <pre><code>request get "https://api.github.com/users/octocat" to dados_json</code></pre>
+
+        <h3><code>json load var_name_string to var_name_json</code></h3>
+        <p>Converte uma string JSON armazenada em uma variável para um objeto Linex, permitindo o acesso a seus dados internos.</p>
+        <pre><code>json load dados_json to dados_obj
+linex print dados_obj.login # Acessando um campo do objeto
+linex print dados_obj.id</code></pre>
+        
+        <h3><code>sleep segundos</code></h3>
+        <p>Pausa a execução do script por um número de segundos especificado.</p>
+        <pre><code>linex print "Aguardando 2 segundos..."
+sleep 2</code></pre>
+        
+        <h3><code>if condicao begin ... end if</code></h3>
+        <p>Executa um bloco de código se a condição for verdadeira. Também suporta <code>else</code> para um bloco alternativo.</p>
+        <pre><code>if idade > 18 begin
+    linex print "Voce e maior de idade."
+else begin
+    linex print "Voce e menor de idade."
+end if</code></pre>
+        
+        <h3><code>loop numero begin ... end loop</code></h3>
+        <p>Executa um bloco de código um número fixo de vezes.</p>
+        <pre><code>loop 3 begin
+    linex print "Loop em execucao."
+end loop</code></pre>
+
+        <h3><code>func nome begin ... end func</code></h3>
+        <p>Define uma função, um bloco de código reutilizável.</p>
+        <pre><code>func saudacao begin
+    linex print "Ola, do interior da funcao!"
+end func</code></pre>
+
+        <h3><code>call nome</code></h3>
+        <p>Executa o código de uma função.</p>
+        <pre><code>call saudacao</code></pre>
+
+        <h3><code>save "arquivo"</code> | <code>load "arquivo"</code></h3>
+        <p><strong><code>save</code>:</strong> Salva todas as variáveis em um arquivo JSON.
+        <br><strong><code>load</code>:</strong> Carrega variáveis de um arquivo JSON.</p>
+        <pre><code>save "dados_do_jogo"
+load "dados_do_jogo"</code></pre>
+        
+        ---
+        <h2 id="bib">4. Bibliotecas Padrão</h2>
+        <p>A linguagem Linex possui acesso a diversas funções e módulos de bibliotecas padrão do Python para tarefas comuns. Você pode usá-los dentro de expressões e comandos como <code>calc</code> e <code>var</code>.</p>
+        
+        <h3><code>math</code></h3>
+        <p>Acesse funções matemáticas como <code>math.sqrt()</code> (raiz quadrada) e <code>math.pi</code> (o valor de PI).</p>
+        <pre><code>var area = calc math.pi * 5 * 5
+linex print "A raiz quadrada de 16 e: " + math.sqrt(16)</code></pre>
+        
+        <h3><code>random</code></h3>
+        <p>Gere números aleatórios com <code>random.randint()</code>.</p>
+        <pre><code>var numero_aleatorio = calc random.randint(1, 10)
+linex print "Seu numero da sorte e: " + numero_aleatorio</code></pre>
+        
+        <h3><code>datetime</code></h3>
+        <p>Obtenha a data e hora atuais usando <code>datetime.now()</code>.</p>
+        <pre><code>var agora = datetime.now()
+linex print "Data e hora atuais: " + agora</code></pre>
+        
+        <h3><code>Counter</code></h3>
+        <p>Use a estrutura de dados <code>Counter</code> para contar elementos em uma coleção.</p>
+        <pre><code>var lista_frutas = ["maca", "banana", "maca", "laranja"]
+var contagem = Counter(lista_frutas)
+linex print "Contagem de frutas: " + contagem</code></pre>
+
+        ---
+        <h2 id="exemplo">5. Exemplo de Código Completo</h2>
+        <p>Este script demonstra o uso de vários comandos para criar um pequeno programa interativo.</p>
+        <pre class="code-block"><code>linex init project
+
+# Boas-vindas
+linex print "Bem-vindo ao Linex!"
+linex print "Versão 1.2"
+sleep 1
+
+# Entrada e calculo com bibliotecas
+input nome_usuario
+var idade = calc 2025 - 1990 # Exemplo de calc
+
+# Requisição web
+request get "https://jsonplaceholder.typicode.com/posts/1" to post_data
+json load post_data to post_obj
+
+# Exibindo resultado e usando condicional
+linex print "Ola, " + nome_usuario + "!"
+linex print "O titulo do post e: " + post_obj.title
+linex print "O ID do usuario e: " + post_obj.userId
+
+# Chamando função e loop
+func loop_message begin
+    linex print "Executando loop..."
+end func
+
+loop 3 begin
+    call loop_message
+end loop
+
+# Fim do programa
+linex print "Fim da execucao."
+</code></pre>
+    </div>
+</body>
+</html>

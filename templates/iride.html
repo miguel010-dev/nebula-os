@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Black & Purple</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        /* Reset básico e tipografia */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212; /* Fundo preto bem escuro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #e0e0e0; /* Cor do texto principal */
+        }
+
+        /* Container principal do card de login */
+        .login-container {
+            background-color: #1e1e1e; /* Um tom de cinza escuro para o card */
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #333; /* Borda sutil para definir o card */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Efeito de hover */
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Título do formulário */
+        .login-container h2 {
+            margin-bottom: 1.5rem;
+            color: #bb86fc; /* Roxo para o título */
+            font-weight: 600;
+        }
+
+        /* Estilo dos campos de formulário */
+        .input-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            color: #a0a0a0;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: #2c2c2c; /* Fundo dos campos */
+            color: #e0e0e0;
+            border: 1px solid #444;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #bb86fc; /* Borda roxa ao focar */
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2);
+        }
+
+        /* Estilo do botão */
+        .btn {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: #bb86fc; /* Fundo do botão roxo */
+            color: #121212; /* Cor do texto no botão */
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .btn:hover {
+            background-color: #9c6cde; /* Tom de roxo mais escuro no hover */
+        }
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+
+        /* Rodapé com links */
+        .login-footer {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .login-footer a {
+            color: #bb86fc; /* Roxo para os links */
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .login-footer a:hover {
+            color: #9c6cde;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Admin</h2>
+        <form action="/idepassword" method="post">
+            <div class="input-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="user" name="user" placeholder="Digite seu usuário" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Senha</label>
+                <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+            </div>
+            <button type="submit" class="btn">Entrar</button>
+        
+        <div class="login-footer">
+            <a href="#">Esqueceu a senha?</a>
+        </div>
+        </form>
+    </div>
+
+</body>

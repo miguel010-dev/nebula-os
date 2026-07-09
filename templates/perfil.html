@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SquareOS • Perfil</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="icon" href="assets/icones/icones 1/logo.png" type="image/png">
+<style>
+/*
+ * As variáveis e estilos base (body, aura-glow, nav, btn-icon, btn-primary, etc.)
+ * são as mesmas usadas na página inicial para garantir a coerência.
+ * Apenas os estilos específicos do Perfil são adicionados/modificados abaixo.
+*/
+
+/* --- VARIÁVEIS DE COR E ESTILO --- */
+:root {
+    --bg-dark: #0A0A14;
+    --text-light: #F0F0FF;
+    --text-muted: #A0AEC0; 
+    --primary-purple: #A366FF; 
+    --secondary-magenta: #E040FB; 
+    --glass-bg-card: rgba(18, 18, 30, 0.75); 
+    --glass-nav: rgba(5, 5, 10, 0.95);
+    --border-color-subtle: rgba(163, 102, 255, 0.1); 
+    --shadow-glow: 0 0 10px rgba(163, 102, 255, 0.2);
+    --transition-speed: 0.3s ease-in-out;
+    --danger-red: #E74C3C; 
+
+    /* Tema Claro */
+    --light-bg: #F9F9F9;
+    --light-text: #2D3748;
+    --light-card-bg: rgba(255, 255, 255, 1);
+    --light-nav: rgba(255, 255, 255, 0.95);
+
+    /* Cores VIP */
+    --vip-gold: #FFD700;
+    --vip-yellow: #FFCC00;
+}
+
+/* --- ESTILOS BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    overflow-x: hidden;
+    position: relative;
+    transition: background 0.5s, color 0.5s;
+    line-height: 1.6;
+}
+
+body.light {
+    background: var(--light-bg);
+    color: var(--light-text);
+}
+
+/* --- BACKGROUND AURA --- */
+.aura-glow {
+    position: absolute;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    filter: blur(300px); 
+    opacity: 0.15;
+    z-index: 0;
+    animation: moveAura 20s infinite alternate ease-in-out; 
+}
+.aura-1 {
+    background: radial-gradient(circle, var(--primary-purple), transparent 70%);
+    top: 10%; left: 10%;
+}
+.aura-2 {
+    background: radial-gradient(circle, var(--secondary-magenta), transparent 70%);
+    bottom: 10%; right: 10%;
+    animation-delay: -9s;
+}
+@keyframes moveAura {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, -20px) scale(1.05); }
+    100% { transform: translate(-40px, 20px) scale(1); }
+}
+
+/* --- NAVIGATION BAR --- (Mesmo estilo clean) */
+.nav {
+    position: sticky; 
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 1000;
+    background: var(--glass-nav);
+    backdrop-filter: blur(25px); 
+    border-bottom: 1px solid var(--border-color-subtle);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+}
+.logo { height: 40px; }
+.actions { display: flex; gap: 12px; align-items: center; }
+
+/* Botões de Ícone */
+.btn-icon {
+    font-size: 18px;
+    color: var(--text-light);
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: var(--transition-speed);
+    line-height: 1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-icon:hover {
+    background: rgba(163, 102, 255, 0.2);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(163, 102, 255, 0.3);
+    border-color: var(--primary-purple);
+}
+
+/* Botões de Ação */
+.btn {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px; 
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-speed);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+}
+.btn-primary {
+    background: linear-gradient(90deg, var(--primary-purple), var(--secondary-magenta));
+    color: var(--bg-dark);
+    box-shadow: 0 6px 20px rgba(163, 102, 255, 0.6);
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(163, 102, 255, 1);
+}
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+    border-color: var(--primary-purple);
+}
+.btn-danger {
+    background: var(--danger-red);
+    color: var(--text-light);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+}
+.btn-danger:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+/* Estilo VIP (para a nav) */
+.vip-medal {
+    color: var(--vip-gold);
+    font-size: 1.0rem;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    padding: 8px 14px;
+    border: 2px solid var(--vip-gold);
+    border-radius: 12px;
+    background: rgba(255, 215, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+}
+
+/* --- ESTILOS ESPECÍFICOS DO PERFIL --- */
+
+.profile-container {
+    padding: 70px 30px;
+    max-width: 900px; /* Mais estreito para focar o conteúdo */
+    margin: auto;
+    z-index: 1;
+    position: relative;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.profile-header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(163, 102, 255, 0.2);
+}
+
+.profile-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-purple), var(--secondary-magenta));
+    padding: 5px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(163, 102, 255, 0.4);
+    transition: var(--transition-speed);
+}
+.profile-avatar i {
+    font-size: 50px;
+    color: var(--bg-dark);
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+.profile-card {
+    background: var(--glass-bg-card);
+    backdrop-filter: blur(18px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--border-color-subtle);
+}
+
+body.light .profile-card {
+    background: var(--light-card-bg);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.profile-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--primary-purple);
+    font-weight: 700;
+    border-bottom: 2px solid var(--border-color-subtle);
+    padding-bottom: 10px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05); /* Separador sutil */
+}
+
+body.light .info-item {
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--text-muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.info-label i {
+    color: var(--primary-purple);
+}
+
+.info-value {
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+body.light .info-value {
+    color: var(--light-text);
+}
+
+/* Destaque VIP no Card */
+.vip-status {
+    font-weight: 800;
+    color: var(--vip-gold);
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    font-size: 1.1rem;
+}
+
+/* Botões de Ação no Footer do Container */
+.profile-actions {
+    margin-top: 50px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 480px) {
+    .profile-header h1 {
+        font-size: 2.5rem;
+    }
+    .profile-actions {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+<body onload="checkTheme()">
+
+<div class="aura-glow aura-1"></div>
+<div class="aura-glow aura-2"></div>
+
+<div class="nav">
+    <img class="logo" src="https://i.postimg.cc/2yR5JBJd/logo.png" alt="Square OS" />
+    <div class="actions">
+        <a href="{{ url_for('inicio') }}" class="btn-icon" title="Voltar para Início">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        
+        {% if user_info.vip %}
+        <span class="vip-medal" title="Usuário VIP">
+            <i class="fa-solid fa-medal"></i> VIP
+        </span>
+        {% else %}
+        <a href="{{ url_for('comprarvip') }}" class="btn btn-primary" style="padding: 10px 20px;">
+             <i class="fa-solid fa-star"></i> Obter VIP
+        </a>
+        {% endif %}
+
+        <a href="{{ url_for('logout') }}" class="btn-icon" title="Sair da Conta">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+        
+        <button class="btn-icon toggle-theme" onclick="toggleTheme()" title="Alternar Tema">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+    </div>
+</div>
+
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <i class="fa-solid fa-user-astronaut"></i> </div>
+        <h1>Olá, {{ user_info.nome }}</h1>
+        <p>Gerencie as configurações da sua conta e o status do plano.</p>
+    </div>
+
+    <div class="profile-grid">
+        
+        <div class="profile-card">
+            <h3><i class="fa-solid fa-circle-info"></i> Detalhes da Conta</h3>
+            
+            <div class="info-item">
+                <span class="info-label"><i class="fa-solid fa-id-badge"></i> ID de Usuário:</span>
+                <span class="info-value">{{ user_info.id }}</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label"><i class="fa-solid fa-envelope"></i> E-mail:</span>
+                <span class="info-value">{{ user_info.email }}</span>
+            </div>
+            
+            
+            <div class="info-item">
+                <span class="info-label"><i class="fa-solid fa-server"></i> Máquinas Criadas:</span>
+                <span class="info-value">{{ user_info.maquinas_criadas }}</span>
+            </div>
+            
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="fa-solid fa-shield-alt"></i> Plano & Segurança</h3>
+            
+            <div class="info-item">
+                <span class="info-label"><i class="fa-solid fa-star"></i> Status do Plano:</span>
+                <span class="info-value">
+                    {% if user_info.vip %}
+                        <span class="vip-status">VIP ATIVO</span>
+                    {% else %}
+                        GRATUITO
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label"><i class="fa-solid fa-key"></i> Autenticação 2FA:</span>
+                <span class="info-value">
+                    {% if user_info.two_factor_enabled %}
+                        ATIVADA
+                    {% else %}
+                        DESATIVADA
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label"><i class="fa-solid fa-globe"></i> Armazenamento</span>
+                <span class="info-value">{{ user_info.armazenamento }} GIGAS</span>
+            </div>
+
+             
+
+        </div>
+
+    </div>
+    
+    <div class="profile-actions">
+        
+        
+    </div>
+
+</div>
+
+<script>
+// Mantido o toggleTheme para garantir a persistência do estilo.
+function toggleTheme() {
+    const body = document.body;
+    body.classList.toggle("light");
+    const themeIcon = document.querySelector(".toggle-theme i");
+    if (body.classList.contains("light")) {
+        themeIcon.classList.remove("fa-moon");
+        themeIcon.classList.add("fa-sun");
+    } else {
+        themeIcon.classList.remove("fa-sun");
+        themeIcon.classList.add("fa-moon");
+    }
+}
+
+// Função para simular a verificação do tema ao carregar
+function checkTheme() {
+     // Em uma aplicação real, você leria isso do localStorage ou cookie
+    const themeIcon = document.querySelector(".toggle-theme i");
+    if (document.body.classList.contains("light")) {
+        themeIcon.classList.remove("fa-moon");
+        themeIcon.classList.add("fa-sun");
+    } else {
+        themeIcon.classList.remove("fa-sun");
+        themeIcon.classList.add("fa-moon");
+    }
+}
+
+
+
+</script>
+</body>
+</html>

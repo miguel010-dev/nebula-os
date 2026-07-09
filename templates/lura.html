@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot - Ultra Black & Animated</title>
+    <style>
+        :root {
+            /* Cores Ultra Black & Clean */
+            --bg-principal: #0a0a0a; /* Preto profundo para o fundo principal */
+            --bg-superficie: #1c1c1c; /* Fundo da área de chat */
+            
+            /* Tipografia */
+            --texto-principal: #f0f0f0; /* Branco brilhante para contraste */
+            --texto-secundario: #8a8a8a; /* Cinza sutil */
+            
+            /* Cor de Destaque */
+            --cor-destaque: #00e5ff; /* Ciano Neon/Elétrico (mais vivo) */
+            --cor-destaque-hover: #00b8cc; 
+            
+            /* Mensagens */
+            --user-bubble-bg: #00e5ff; 
+            --bot-bubble-bg: #2c2c2c; /* Bolha mais escura */
+            
+            /* Glassmorphism (Mais sutil e escuro) */
+            --glass-bg-color: rgba(28, 28, 28, 0.7); /* Fundo semi-transparente muito escuro */
+            --glass-border-color: rgba(0, 229, 255, 0.1); /* Borda de destaque neon sutil */
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-principal);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+            color: var(--texto-principal);
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-superficie);
+        }
+
+        /* ------------------ Rag Top (Cabeçalho Glassmorphism Minimalista) ------------------ */
+        .rag-top {
+            position: sticky;
+            top: 0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+
+            /* Estilo Glassmorphism Refinado */
+            background: var(--glass-bg-color);
+            backdrop-filter: blur(15px); /* Mais blur */
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Sombra mais profunda */
+        }
+
+        .rag-top .title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--texto-principal);
+            text-shadow: 0 0 5px rgba(0, 229, 255, 0.5); /* Efeito Neon Sutil */
+        }
+        
+        .rag-top-actions button {
+            background-color: transparent;
+            color: var(--cor-destaque);
+            border: 1px solid var(--cor-destaque);
+            padding: 8px 12px;
+            border-radius: 20px; /* Mais arredondado (Pill shape) */
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 10px;
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+
+        .rag-top-actions button:hover {
+            background-color: var(--cor-destaque);
+            color: var(--bg-principal);
+            box-shadow: 0 0 10px var(--cor-destaque); /* Efeito Neon no hover */
+        }
+
+        /* ------------------ Mensagens (Scrollable) ------------------ */
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px 20px 100px 20px; 
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            /* Scrollbar clean */
+            scrollbar-color: var(--texto-secundario) var(--bg-superficie);
+        }
+        .chat-messages::-webkit-scrollbar { width: 8px; }
+        .chat-messages::-webkit-scrollbar-thumb { background-color: var(--texto-secundario); border-radius: 4px; }
+        .chat-messages::-webkit-scrollbar-track { background-color: var(--bg-superficie); }
+
+
+        /* Estilos de Mensagem com Animação */
+        .message-row { 
+            display: flex; 
+            align-items: flex-start; 
+            opacity: 0; 
+            transform: translateY(10px); 
+            animation: fadeIn 0.4s ease-out forwards; 
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 30px; height: 30px; border-radius: 50%; 
+            background-color: var(--cor-destaque); margin-right: 15px; flex-shrink: 0;
+            display: flex; justify-content: center; align-items: center; font-weight: bold;
+            font-size: 14px; color: var(--bg-principal); 
+            box-shadow: 0 0 5px rgba(0, 229, 255, 0.4); /* Sombra Neon suave */
+        }
+        .message-content { max-width: 70%; display: flex; flex-direction: column; }
+        .message-header { font-size: 13px; font-weight: 500; color: var(--texto-secundario); margin-bottom: 4px; }
+        .message-bubble {
+            padding: 12px 18px; border-radius: 18px; /* Mais arredondado */
+            line-height: 1.6;
+            font-size: 16px; 
+            word-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+            transition: all 0.3s ease-out; /* Transição na bolha para mouseover ou futuros efeitos */
+        }
+
+        .bot-message .message-bubble { background-color: var(--bot-bubble-bg); color: var(--texto-principal); }
+        .user-message { justify-content: flex-end; }
+        .user-message .message-content { align-items: flex-end; max-width: 70%; }
+        .user-message .message-bubble { 
+            background-color: var(--cor-destaque); 
+            color: var(--bg-principal); 
+            font-weight: 600;
+            border-bottom-right-radius: 4px; /* Ponta sutil */
+        }
+        .bot-message .message-bubble {
+            border-bottom-left-radius: 4px; /* Ponta sutil */
+        }
+        
+        /* Efeito de Digitação Realista */
+        .typing-effect {
+            width: fit-content;
+            border-right: 2px solid var(--texto-principal); /* Cursor de digitação */
+            white-space: nowrap;
+            overflow: hidden;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        /* Animação do Cursor */
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--texto-principal); }
+        }
+
+
+        /* ------------------ Área de Input (Glassmorphism) ------------------ */
+        .chat-input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px; /* Menos padding */
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+            
+            /* Estilo Glassmorphism */
+            background: var(--glass-bg-color);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid var(--glass-border-color);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5); 
+        }
+
+        .input-wrapper {
+            width: 100%;
+            max-width: 800px; /* Ligeiramente mais largo */
+            display: flex;
+            align-items: flex-end;
+            background-color: var(--bot-bubble-bg); /* Usando cor de bolha para o wrapper */
+            border-radius: 10px;
+            border: 1px solid var(--glass-border-color);
+            padding: 8px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--cor-destaque);
+            box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.3); /* Foco neon */
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 8px 10px;
+            border: none;
+            background-color: transparent;
+            font-size: 16px;
+            color: var(--texto-principal);
+            outline: none;
+            resize: none;
+            min-height: 20px;
+            max-height: 100px; /* Altura máxima menor */
+            overflow-y: auto;
+        }
+
+        .send-button {
+            background-color: var(--cor-destaque);
+            color: var(--bg-principal);
+            border: none;
+            border-radius: 6px; 
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, transform 0.2s;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background-color: var(--cor-destaque-hover);
+            transform: scale(1.05); /* Pequena animação no hover */
+        }
+
+        .send-button:disabled {
+            background-color: #3a3a3c;
+            color: var(--texto-secundario);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        
+        <div class="rag-top">
+            <div class="title">LURA - INTELIGENCIA ARTIFICIAL DEDICADA</div>
+            <div class="rag-top-actions">
+                <button onclick="alert('Função: Nova Conversa Iniciada!')">✨ Nova</button>
+                <button onclick="alert('Função: Abrir Ajustes.')">⚙️ Ajustes</button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="message-row bot-message" style="animation-delay: 0.1s;">
+                <div class="message-avatar">AI</div>
+                <div class="message-content">
+                    <div class="message-header">Sistema</div>
+                    <div class="message-bubble">
+                        <span class="typing-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message-row user-message" style="animation-delay: 0.2s;">
+                <div class="message-content">
+                    <div class="message-bubble">
+                        O efeito de vidro ficou incrível no topo e no input! Agora sim está ultra-moderno. Me ajude a planejar 5 etapas de um projeto.
+                    </div>
+                </div>
+            </div>
+
+            <div class="message-row bot-message" style="animation-delay: 0.3s;">
+                <div class="message-avatar">AI</div>
+                <div class="message-content">
+                    <div class="message-header">Gerente de Projetos (Módulo Ativo)</div>
+                    <div class="message-bubble">
+                         **Planejamento Ágil:**<br><br>1. **Iniciação e Escopo (Discovery):** Definição de objetivos e requisitos de alto nível.<br>2. **Planejamento de Sprints:** Divisão do trabalho em ciclos curtos e definidos.<br>3. **Execução e Desenvolvimento:** Implementação e testes contínuos.<br>4. **Revisão (Review):** Apresentação e feedback dos resultados após cada ciclo.<br>5. **Retrospectiva:** Lições aprendidas e ajuste de processo para o próximo ciclo.
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="chat-input-area">
+            <div class="input-wrapper">
+                <textarea class="chat-input" id="message-input" placeholder="Comando ou Mensagem..." rows="1"></textarea>
+                <button class="send-button" id="send-button" disabled>
+                    &#10148;
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('message-input');
+        const button = document.getElementById('send-button');
+        const messagesContainer = document.getElementById('chat-messages');
+        const initialBotMessage = "Interface Ultra-Black, Rag Top minimalista e animações ativadas. Estou pronto para trabalhar com um visual futurista.";
+
+        // Função para simular o efeito de digitação
+        function typeText(element, text, delay = 50) {
+            let i = 0;
+            element.classList.add('typing-effect');
+            return new Promise(resolve => {
+                const interval = setInterval(() => {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                        // Rola para o final a cada caractere
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight; 
+                    } else {
+                        clearInterval(interval);
+                        element.classList.remove('typing-effect');
+                        resolve();
+                    }
+                }, delay);
+            });
+        }
+
+        // Simula o typing do bot e adiciona a mensagem ao DOM
+        function appendBotMessage(text, header = "Gerente de Projetos (Módulo Ativo)", delay = 1500) {
+            setTimeout(() => {
+                const botMsgRow = document.createElement('div');
+                botMsgRow.className = 'message-row bot-message';
+                botMsgRow.style.animationDelay = '0s'; // Animação de entrada imediata
+                botMsgRow.innerHTML = `
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        <div class="message-header">${header}</div>
+                        <div class="message-bubble">
+                            <span class="typing-text"></span>
+                        </div>
+                    </div>
+                `;
+                messagesContainer.appendChild(botMsgRow);
+                const typingElement = botMsgRow.querySelector('.typing-text');
+                
+                // Inicia o efeito de digitação na nova bolha
+                typeText(typingElement, text, 30);
+            }, delay);
+        }
+
+        // Função para ajustar a altura da textarea
+        function adjustTextareaHeight() {
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        }
+
+        // Inicia a mensagem de boas-vindas com o efeito de digitação
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialTypingElement = document.querySelector('.message-row.bot-message .typing-text');
+            typeText(initialTypingElement, initialBotMessage);
+
+            // Remove as mensagens estáticas para que apenas a inicial animada fique, 
+            // e as próximas sejam adicionadas pelo JS
+            const staticUserMessage = document.querySelector('.message-row.user-message');
+            const staticBotResponse = document.querySelectorAll('.message-row.bot-message')[1];
+            if(staticUserMessage) staticUserMessage.remove();
+            if(staticBotResponse) staticBotResponse.remove();
+        });
+
+
+        // Listeners para o Input e Botão de Envio
+        input.addEventListener('input', () => {
+            button.disabled = input.value.trim() === '';
+            adjustTextareaHeight();
+        });
+
+        button.addEventListener('click', () => {
+            const messageText = input.value.trim();
+            if (messageText) {
+                // Adiciona a mensagem do usuário (Sem delay de animação)
+                const userMsgRow = document.createElement('div');
+                userMsgRow.className = 'message-row user-message';
+                userMsgRow.style.animationDelay = '0s'; 
+                userMsgRow.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-bubble">${messageText}</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(userMsgRow);
+
+                input.value = '';
+                button.disabled = true;
+                input.style.height = 'auto'; 
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // SIMULAÇÃO DE RESPOSTA DO BOT com Animação de Digitação
+                const botResponseText = "Mensagem recebida! Com a nova interface, a resposta está sendo gerada com velocidade máxima. Agora, vamos definir os marcos (milestones) para as 5 etapas do seu projeto.";
+                appendBotMessage(botResponseText);
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey && !button.disabled) {
+                e.preventDefault(); 
+                button.click();
+            }
+        });
+
+        // Garantir que a área de input seja ajustada ao carregar
+        adjustTextareaHeight();
+    </script>
+
+</body>
+</html>

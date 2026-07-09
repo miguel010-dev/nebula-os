@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil - Byte Mail</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #111;
+    color: #e0e0e0;
+  }
+
+  form.profile-container {
+    max-width: 900px;
+    margin: 50px auto;
+    background: #1f1f1f;
+    border-radius: 16px;
+    padding: 40px;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+  }
+
+  /* Foto do usuário */
+  .profile-photo {
+    position: relative;
+    flex: 1 1 250px;
+    display: flex;
+    justify-content: center;
+  }
+  .profile-photo img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ff3b3b;
+  }
+  .change-photo-btn {
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    transform: translateX(50%);
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .change-photo-btn:hover { background: #155ab6; }
+  #profilePhotoInput { display: none; }
+
+  /* Informações do usuário */
+  .profile-info {
+    flex: 2 1 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .profile-info label {
+    font-weight: 600;
+    color: #ccc;
+    font-size: 14px;
+  }
+  .profile-info input, .profile-info select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    font-size: 14px;
+    background: #111;
+    color: #e0e0e0;
+  }
+  .profile-info input:disabled, .profile-info select:disabled {
+    background: #1a1a1a;
+    color: #888;
+  }
+
+  .profile-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s;
+    font-size: 14px;
+  }
+  .btn-save { background: #34a853; color: #fff; }
+  .btn-save:hover { background: #2c8c47; }
+  .btn-logout { background: #ff3b3b; color: #fff; }
+  .btn-logout:hover { background: #d32f2f; }
+
+  @media(max-width: 768px){
+    form.profile-container {
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    .profile-info { text-align: center; }
+    .profile-actions { justify-content: center; }
+    .change-photo-btn { bottom: -10px; }
+  }
+</style>
+</head>
+<body>
+
+<form class="profile-container" action="{{ url_for('editar_perfil') }}" method="POST" enctype="multipart/form-data">
+  <div class="profile-photo">
+    <img id="profileImage" src="{{ user['foto'] }}" alt="Foto do Usuário">
+    <label for="profilePhotoInput" class="change-photo-btn">Trocar Foto</label>
+    <input type="file" id="profilePhotoInput" name="foto" accept="image/*">
+  </div>
+
+  <div class="profile-info">
+    <label for="nome">Nome</label>
+    <input type="text" id="nome" name="nome" value="{{ user['nome'] }}" required>
+
+    <label for="email">E-mail</label>
+    <input type="email" id="email" name="email" value="{{ user['email'] }}" disabled>
+
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="ativo" {% if user['status'] == 'ativo' %}selected{% endif %}>Ativo</option>
+      <option value="inativo" {% if user['status'] == 'inativo' %}selected{% endif %}>Inativo</option>
+    </select>
+
+    <label for="dataCadastro">Usuário desde</label>
+    <input type="text" id="dataCadastro" value="Janeiro 2025" disabled>
+
+    <div class="profile-actions">
+      <button type="submit" class="btn btn-save">Salvar Alterações</button>
+      <a href="{{ url_for('logout') }}" class="btn btn-logout">Sair</a>
+    </div>
+  </div>
+</form>
+
+<script>
+  // Preview da foto de perfil
+  const input = document.getElementById('profilePhotoInput');
+  const img = document.getElementById('profileImage');
+
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = function(event){
+        img.src = event.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+
+</body>
+</html>

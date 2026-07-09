@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Aplicativo | SquareOS</title>
+    <link rel="icon" href="assets/icones/icones 1/logo.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+      :root {
+    --bg-dark: #121212;
+    --card-dark: #1e1e1e;
+    --text-light: #fff;
+    --text-muted: #ccc;
+    --input-bg: #2a2a2a;
+    --primary-color: #0f62fe;
+    --primary-hover: #0353e9;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --border-color: #333;
+    --shadow-color: rgba(0,0,0,0.4);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: var(--card-dark);
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 2rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+input, textarea {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-light);
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+textarea {
+    height: 120px;
+}
+
+button {
+    width: 100%;
+    background-color: var(--primary-color);
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.status-message {
+    text-align: center;
+    padding: 12px;
+    margin-top: 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: none;
+}
+
+.status-message.success {
+    background-color: var(--success-color);
+}
+
+.status-message.error {
+    background-color: var(--error-color);
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="form-title">Adicionar Novo Aplicativo</h2>
+        <form id="cadastroForm">
+            <div class="form-group">
+                <label for="nomeapp">Nome do App</label>
+                <input type="text" id="nomeapp" name="nomeapp" placeholder="Ex: Square Editor" required>
+            </div>
+            <div class="form-group">
+                <label for="preco">Preço</label>
+                <input type="number" id="preco" name="preco" placeholder="Ex: 9.99" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" placeholder="Digite uma descrição detalhada do aplicativo"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="logoapp">URL da Logo</label>
+                <input type="url" id="logoapp" name="logoapp" placeholder="Ex: https://dominio.com/logo.png" required>
+            </div>
+            <div class="form-group">
+                <label for="developer">Desenvolvedor</label>
+                <input type="text" id="developer" name="developer" placeholder="Ex: Square Labs" required>
+            </div>
+            <div class="form-group">
+                <label for="rating">Avaliação (0-5)</label>
+                <input type="number" id="rating" name="rating" placeholder="Ex: 4.5" step="0.1" min="0" max="5" required>
+            </div>
+            <button type="submit" id="submitBtn">Cadastrar</button>
+            <div id="statusMessage" class="status-message"></div>
+        </form>
+    </div>
+
+    <script src="script.js">
+      document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('cadastroForm');
+    const statusMessage = document.getElementById('statusMessage');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Impede o envio padrão do formulário (recarregamento da página)
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        // Validação de dados de exemplo
+        if (data.rating < 0 || data.rating > 5) {
+            showStatusMessage('A avaliação deve ser entre 0 e 5.', 'error');
+            return;
+        }
+
+        // Exibe mensagem de carregamento e desabilita o botão
+        submitBtn.textContent = 'Enviando...';
+        submitBtn.disabled = true;
+        showStatusMessage('Cadastrando aplicativo...', 'info');
+
+        try {
+            // **ATENÇÃO: Mude esta URL para a sua rota de API de cadastro**
+            const response = await fetch('/cadastrar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showStatusMessage('Aplicativo cadastrado com sucesso!', 'success');
+                form.reset(); // Limpa o formulário
+            } else {
+                showStatusMessage(result.message || 'Erro ao cadastrar aplicativo.', 'error');
+            }
+        } catch (error) {
+            console.error('Erro de conexão:', error);
+            showStatusMessage('Erro de conexão com o servidor. Tente novamente.', 'error');
+        } finally {
+            // Reabilita o botão após a resposta
+            submitBtn.textContent = 'Cadastrar';
+            submitBtn.disabled = false;
+        }
+    });
+
+    function showStatusMessage(message, type) {
+        statusMessage.textContent = message;
+        statusMessage.className = `status-message ${type}`;
+        statusMessage.style.display = 'block';
+    }
+});
+    </script>
+</body>
+</html>

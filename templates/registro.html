@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square OS - Registro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="assets/icones/icones 1/logo.png" type="image/png">
+    <style>
+        /* --- Variáveis de Cores e Estilos - Tema Roxo/Neon --- */
+        :root {
+            --bg-dark: #000000;
+            --text-light: #F0F0FF;
+            --text-muted: #8F9BB3; /* Cinza azulado suave */
+            --primary-purple: #A366FF; /* Roxo principal */
+            --secondary-magenta: #E040FB; /* Magenta para gradientes */
+            --glass-bg: rgba(10, 10, 20, 0.75); /* Fundo escuro semi-transparente */
+            --border-color-subtle: rgba(163, 102, 255, 0.2);
+            --shadow-glow: 0 0 25px rgba(163, 102, 255, 0.3);
+            --shadow-deep: 0 10px 40px rgba(0, 0, 0, 0.7);
+            --transition-speed: 0.3s ease-in-out;
+        }
+
+        /* --- Reset e Base --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Aura de Fundo (Mais Clean) --- */
+        .aura-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(200px);
+            opacity: 0.4;
+            z-index: 0;
+            animation: moveAura 15s infinite alternate;
+        }
+        .aura-1 {
+            background: radial-gradient(circle, var(--primary-purple), transparent 60%);
+            top: 5%; left: 5%;
+        }
+        .aura-2 {
+            background: radial-gradient(circle, var(--secondary-magenta), transparent 60%);
+            bottom: 5%; right: 5%;
+            animation-delay: -7.5s;
+        }
+        @keyframes moveAura {
+            from { transform: translate(0, 0); }
+            to { transform: translate(50px, 50px); }
+        }
+
+        /* --- Container do Formulário (Redondo e Clean) --- */
+        .container {
+            position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px; /* Mais arredondado */
+            padding: 40px;
+            width: 100%;
+            max-width: 400px; /* Largura ideal para formulário */
+            text-align: center;
+            box-shadow: var(--shadow-deep), var(--shadow-glow);
+            z-index: 1;
+            border: 1px solid var(--border-color-subtle);
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: 1.5px;
+            color: var(--text-light);
+            text-shadow: 0 0 10px rgba(163, 102, 255, 0.5);
+        }
+
+        /* --- Input Groups (Mais Espaçoso e Profissional) --- */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            transition: var(--transition-speed);
+        }
+
+        input {
+            width: 100%;
+            padding: 18px 18px 18px 50px; /* Mais padding vertical e espaço para ícone */
+            border: 1px solid rgba(60, 60, 70, 0.5);
+            border-radius: 12px;
+            background: rgba(30, 30, 40, 0.9);
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition-speed);
+        }
+
+        input::placeholder { color: var(--text-muted); }
+
+        input:focus {
+            background: rgba(30, 30, 40, 1);
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 10px rgba(163, 102, 255, 0.6);
+        }
+        input:focus + i {
+            color: var(--primary-purple);
+        }
+
+        /* --- Botões --- */
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-speed);
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Botão de REGISTRAR (Estilo Principal) */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-magenta));
+            color: var(--bg-dark);
+            box-shadow: 0 8px 25px rgba(163, 102, 255, 0.4);
+            text-transform: uppercase;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(163, 102, 255, 0.7);
+        }
+        
+        /* Divisor e Botão Google: OCULTOS */
+        .separator, .btn-google {
+            display: none; 
+        }
+
+        /* Link de Login */
+        .login-link {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .login-link a {
+            color: var(--primary-purple);
+            font-weight: 500;
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+        .login-link a:hover {
+            color: var(--secondary-magenta);
+            text-decoration: underline;
+        }
+
+        /* --- Bolhas (Efeito visual de clique) --- */
+        .bubble {
+            position:absolute; width:10px; height:10px; background: rgba(255,255,255,0.7);
+            border-radius:50%; pointer-events:none;
+            animation: bubblePop 0.5s ease-out forwards; z-index:10;
+        }
+        @keyframes bubblePop {
+            0% { transform: scale(1); opacity:1; }
+            50% { transform: scale(1.8); opacity:0.7; }
+            100% { transform: scale(0); opacity:0; }
+        }
+
+        /* --- Responsividade --- */
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="aura-glow aura-1"></div>
+    <div class="aura-glow aura-2"></div>
+
+    <form action="/registro" method="POST" autocomplete="off">
+        <div class="container">
+            <p class="title">CRIAR CONTA</p>
+
+            <div class="input-group">
+                <input id="nome" name="nome" type="text" placeholder="Nome completo" required>
+                <i class="fas fa-user"></i>
+            </div>
+
+            <div class="input-group">
+                <input id="email" name="email" type="email" placeholder="Email" required>
+                <i class="fas fa-envelope"></i>
+            </div>
+
+            <div class="input-group">
+                <input id="senha" name="senha" type="password" placeholder="Senha" required minlength="8">
+                <i class="fas fa-lock"></i>
+            </div>
+
+            <div class="input-group">
+                <input id="confirmar_senha" name="confirmar_senha" type="password" placeholder="Confirmar senha" required minlength="8">
+                <i class="fas fa-lock"></i>
+            </div>
+
+            <button type="submit" class="btn-primary">REGISTRAR</button>
+            
+            <p class="login-link">
+                Já tem uma conta? <a href="/login">Faça Login</a>
+            </p>
+        </div>
+    </form>
+    
+    <audio id="bubbleSound" preload="auto">
+        </audio>
+
+    <script>
+        const inputs = document.querySelectorAll('input');
+        const container = document.querySelector('.container');
+        // const bubbleSound = document.getElementById('bubbleSound'); // Descomentar se o som for usado
+
+        inputs.forEach(input => {
+            input.addEventListener('click', (e) => {
+  
+                const bubble = document.createElement('span');
+                bubble.className = 'bubble';
+                bubble.style.left = e.offsetX + 'px';
+                bubble.style.top = e.offsetY + 'px';
+                input.parentElement.appendChild(bubble);
+
+                // Remove bolha depois da animação
+                bubble.addEventListener('animationend', () => bubble.remove());
+            });
+        });
+    </script>
+</body>
+</html>

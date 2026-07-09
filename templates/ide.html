@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Code - IDE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Variáveis e Estilos Globais */
+        :root {
+            --bg-dark: #1e1e1e;
+            --bg-medium: #252526;
+            --bg-light: #333333;
+            --text-primary: #cccccc;
+            --text-secondary: #858585;
+            --accent-blue: #007acc;
+            --accent-green: #6a9955;
+            --accent-red: #f44747;
+            --console-bg: #151515;
+            --border-color: #444444;
+            --sidebar-width: 250px;
+            --header-height: 50px;
+            --footer-height: 25px;
+            --border-radius: 4px;
+            --shadow-light: rgba(0, 0, 0, 0.2);
+            --shadow-strong: rgba(0, 0, 0, 0.4);
+            --icon-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .ide-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background-color: var(--bg-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 5px var(--shadow-strong);
+            z-index: 10;
+        }
+
+        .title {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .title i {
+            color: var(--accent-blue);
+            font-size: 1rem;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background-color: #383838;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        #run-btn {
+            background-color: var(--accent-blue);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        #run-btn:hover {
+            background-color: #0060a0;
+        }
+
+        .loading-spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-medium);
+            border-right: 1px solid var(--border-color);
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .sidebar-header button {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar-header button:hover {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .file-list {
+            padding: 0 5px;
+        }
+
+        .file-list-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            margin: 3px 0;
+            border-radius: var(--border-radius);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-list-item:hover {
+            background-color: #383838;
+            color: var(--text-primary);
+        }
+
+        .file-list-item-active {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .file-list-item i {
+            margin-right: 8px;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .file-list-item:hover i, .file-list-item-active i {
+            color: var(--accent-blue);
+        }
+
+        /* Main Panel */
+        .main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-container {
+            flex: 2;
+            overflow: hidden;
+        }
+
+        #monaco-editor {
+            width: 100%;
+            height: 100%;
+        }
+
+        .bottom-panel {
+            display: flex;
+            height: 35vh;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .console-container, .terminal-container, .preview-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--console-bg);
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .terminal-container, .preview-container {
+            border-left: 1px solid var(--border-color);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: var(--bg-medium);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-header h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        #console-output, #terminal-output {
+            flex: 1;
+            padding: 10px 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-primary);
+            background-color: var(--console-bg);
+            scrollbar-color: var(--accent-blue) var(--bg-medium);
+            scrollbar-width: thin;
+        }
+        
+        #console-output .output { color: var(--text-primary); }
+        #console-output .info { color: var(--accent-blue); }
+        #console-output .success { color: var(--accent-green); }
+        #console-output .error { color: var(--accent-red); }
+        #console-output .warning { color: #ffd700; }
+
+        #preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #fff;
+        }
+
+        .terminal-input-container {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .prompt {
+            color: var(--accent-green);
+            font-weight: bold;
+            margin-right: 8px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        #terminal-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            outline: none;
+            font-size: 0.85rem;
+            caret-color: var(--accent-green);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* IA Panel */
+        .ia-container {
+            width: 320px;
+            background-color: var(--bg-medium);
+            border-left: 1px solid var(--border-color);
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ia-voice-effect {
+            position: relative;
+            flex: 1;
+            background: linear-gradient(135deg, var(--bg-dark), var(--bg-medium));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .ia-status-indicator {
+            width: 60px;
+            height: 60px;
+            background-color: var(--accent-blue);
+            border-radius: 50%;
+            position: relative;
+            transition: transform 0.4s ease-out, background-color 0.4s;
+            box-shadow: 0 0 0 0px rgba(0, 122, 204, 0.5);
+        }
+
+        .ia-status-indicator i {
+            font-size: 2.5rem;
+            color: var(--icon-color);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: font-size 0.4s ease-out;
+        }
+
+        .ia-status-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0px var(--accent-blue);
+            transition: box-shadow 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        /* IA States */
+        .ia-container.idle .ia-status-indicator { background-color: var(--bg-light); }
+        .ia-container.listening .ia-status-indicator { background-color: var(--accent-green); }
+        .ia-container.listening .ia-status-indicator::before {
+            animation: pulse-green 1.5s infinite;
+        }
+        .ia-container.speaking .ia-status-indicator {
+            background-color: var(--accent-blue);
+            animation: bounce-speak 1s infinite alternate;
+        }
+        .ia-container.thinking .ia-status-indicator { background-color: var(--accent-blue); }
+        .ia-container.thinking .ia-status-indicator::before {
+            animation: pulse-blue 1.5s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0px var(--accent-green); }
+            100% { box-shadow: 0 0 0 15px rgba(106, 153, 85, 0); }
+        }
+
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0px var(--accent-blue); }
+            100% { box-shadow: 0 0 0 15px rgba(0, 122, 204, 0); }
+        }
+
+        @keyframes bounce-speak {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* Chat Box */
+        .ia-chat-box {
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-dark);
+            position: relative;
+            z-index: 7;
+        }
+
+        .ia-chat-box p {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            text-align: center;
+            margin: 0 0 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .ia-chat-box input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-size: 0.9rem;
+            background-color: var(--bg-medium);
+            color: var(--text-primary);
+            transition: all 0.25s ease;
+        }
+
+        .ia-chat-box input[type="text"]::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .ia-chat-box input[type="text"]:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 6px var(--accent-blue);
+        }
+
+        .ia-chat-box.disabled input[type="text"] {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Notifications */
+        .notification-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background-color: var(--bg-medium);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification .icon {
+            font-size: 1.2rem;
+        }
+
+        .notification.info .icon { color: var(--accent-blue); }
+        .notification.success .icon { color: var(--accent-green); }
+        .notification.error .icon { color: var(--accent-red); }
+        .notification.warning .icon { color: #ffd700; }
+
+        /* Footer */
+        footer {
+            height: var(--footer-height);
+            background: var(--bg-medium);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="title"><i class="fas fa-code"></i> Square Code</div>
+        <div class="actions">
+            <button class="action-btn" id="save-btn"><i class="fas fa-save"></i> Salvar</button>
+            <button class="action-btn" id="run-btn"><i class="fas fa-play"></i> Rodar</button>
+        </div>
+    </header>
+
+    <div class="ide-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Arquivos</h2>
+                <button id="add-file-btn" title="Adicionar Novo Arquivo"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="file-list" id="file-list"></div>
+        </div>
+
+        <div class="main-panel">
+            <div class="editor-container">
+                <div id="monaco-editor"></div>
+            </div>
+
+            <div class="bottom-panel">
+                <div class="console-container">
+                    <div class="panel-header">
+                        <h3>Console</h3>
+                    </div>
+                    <pre id="console-output"></pre>
+                </div>
+                
+                <div class="terminal-container" id="terminal-panel">
+                    <div class="panel-header">
+                        <h3>Terminal</h3>
+                    </div>
+                    <pre id="terminal-output">Terminal pronto. Digite 'ajuda' para começar.</pre>
+                    <div class="terminal-input-container">
+                        <span class="prompt">$</span>
+                        <input type="text" id="terminal-input" placeholder="Digite seu comando...">
+                    </div>
+                </div>
+
+                <div class="preview-container" id="preview-panel">
+                    <div class="panel-header">
+                        <h3>Visualização</h3>
+                    </div>
+                    <iframe id="preview-iframe"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notification-container"></div>
+    <footer>SQUARE OS • IDE COMPLETA PARA DESENVOLVIMENTO WEB</footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+<script>
+    // === ARQUIVOS JS SEPARADOS PARA ORGANIZAÇÃO ===
+    
+    // file-manager.js
+    class FileManager {
+        constructor(uiManager) {
+            this.files = {};
+            this.activeFile = null;
+            this.fileListElement = document.getElementById('file-list');
+            this.ui = uiManager; // Referência ao UIManager
+        }
+
+        getLanguageName(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const languages = {
+                // 'lx' e 'sq' devem ser mapeados para o nome do modo do Monaco
+                'js': 'javascript', 'py': 'python', 'html': 'html',
+                'css': 'css', 'lx': 'lineax', 'sq': 'lineax' // Corrigido para 'lineax'
+            };
+            // Monitored languages for preview/terminal toggling
+            return languages[ext] || 'plaintext';
+        }
+
+        getFileIcon(language) {
+            const icons = {
+                'html': 'fab fa-html5', 'css': 'fab fa-css3-alt',
+                'javascript': 'fab fa-js-square', 'python': 'fab fa-python',
+                // Usando o mesmo ícone para 'lineax' e 'sq'
+                'lineax': 'fas fa-cube', 'plaintext': 'fas fa-file-alt' 
+            };
+            return icons[language] || icons['plaintext'];
+        }
+
+        async loadFiles() {
+            this.ui.logConsole("Carregando arquivos do servidor...", 'info');
+            try {
+                const response = await fetch('/files/list');
+                if (!response.ok) {
+                    throw new Error(`Falha ao listar arquivos: ${response.statusText}`);
+                }
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    this.files = {};
+                    if (result.files.length > 0) {
+                        for (const filename of result.files) {
+                            const language = this.getLanguageName(filename);
+                            this.files[filename] = { content: '', language: language };
+                        }
+                        this.renderFileList();
+                        // Abrir o primeiro arquivo após carregar a lista
+                        if (Object.keys(this.files).length > 0) {
+                            await this.openFile(Object.keys(this.files)[0]);
+                        }
+                    } else {
+                        this.ui.logConsole("Nenhum arquivo encontrado. Crie um novo.", 'info');
+                        this.ui.showNotification("Nenhum arquivo. Comece criando um novo!", 'warning');
+                    }
+                } else {
+                    throw new Error(result.error || 'Erro desconhecido.');
+                }
+            } catch (e) {
+                this.ui.logConsole(`Erro ao carregar arquivos: ${e.message}`, 'error');
+                this.ui.showNotification(`Erro: ${e.message}`, 'error');
+            }
+        }
+
+        renderFileList() {
+            this.fileListElement.innerHTML = '';
+            for (const name in this.files) {
+                const { language } = this.files[name];
+                const iconClass = this.getFileIcon(language);
+                const isActive = name === this.activeFile ? ' file-list-item-active' : '';
+
+                const fileItem = document.createElement('div');
+                fileItem.className = `file-list-item${isActive}`;
+                fileItem.innerHTML = `<i class="${iconClass}"></i> <span class="file-name">${name}</span>`;
+                fileItem.onclick = () => this.openFile(name);
+                this.fileListElement.appendChild(fileItem);
+            }
+        }
+
+        async openFile(name) {
+            // CORREÇÃO 1: Garante que o editor exista antes de tentar salvar
+            if (this.activeFile && this.files[this.activeFile] && window.editor) {
+                // Salva o conteúdo do arquivo anterior antes de abrir um novo
+                this.files[this.activeFile].content = window.editor.getValue();
+            }
+            
+            // CORREÇÃO 2: Evita abrir o arquivo que já está ativo
+            if (name === this.activeFile && this.files[name].content) {
+                this.renderFileList(); // Apenas atualiza o estado visual
+                return;
+            }
+
+            this.activeFile = name;
+            const language = this.files[name].language;
+            
+            try {
+                const response = await fetch(`/get-file-content/${name}`);
+                if (!response.ok) {
+                    // Trata respostas HTTP que não são 200 (e.g., 404)
+                    throw new Error(`Falha ao obter conteúdo do arquivo: ${response.statusText}`);
+                }
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    const content = result.content;
+                    this.files[name].content = content;
+                    
+                    // CORREÇÃO 3: Garante que o editor exista antes de manipulá-lo
+                    if (window.editor) {
+                         window.editor.setValue(content);
+                         monaco.editor.setModelLanguage(window.editor.getModel(), language);
+                    }
+                    
+                    this.ui.logConsole(`Arquivo "${name}" aberto com sucesso.`, 'success');
+                    this.ui.showNotification(`Arquivo "${name}" aberto.`, 'success');
+                } else {
+                    throw new Error(result.error || 'Erro desconhecido ao abrir o arquivo.');
+                }
+            } catch (e) {
+                this.ui.logConsole(`Erro ao abrir arquivo: ${e.message}`, 'error');
+                if (window.editor) {
+                    window.editor.setValue(`// Erro ao carregar o conteúdo do arquivo: ${e.message}`);
+                }
+                this.ui.showNotification(`Erro: ${e.message}`, 'error');
+            } finally {
+                this.renderFileList();
+                this.ui.togglePanels(language);
+            }
+        }
+
+        async saveFile() {
+            if (!this.activeFile || !window.editor) { // Valida a existência do editor
+                this.ui.logConsole('Nenhum arquivo ativo ou editor pronto para salvar.', 'warning');
+                this.ui.showNotification('Nenhum arquivo para salvar.', 'warning');
+                return;
+            }
+            const code = window.editor.getValue();
+            this.ui.showNotification('Salvando...', 'info');
+            try {
+                const response = await fetch('/files/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename: this.activeFile, content: code })
+                });
+                // CORREÇÃO 4: Verifica se a resposta foi bem-sucedida antes de tentar JSON
+                const result = await response.json(); 
+                if (response.ok && result.status === 'success') {
+                    this.ui.logConsole('Arquivo salvo com sucesso!', 'success');
+                    this.ui.showNotification('Arquivo salvo!', 'success');
+                } else {
+                    // Usa a mensagem do servidor ou um padrão
+                    throw new Error(result.message || result.error || 'Erro ao salvar arquivo.'); 
+                }
+            } catch (e) {
+                this.ui.logConsole(`Erro ao salvar arquivo: ${e.message}`, 'error');
+                this.ui.showNotification(`Erro: ${e.message}`, 'error');
+            }
+        }
+
+        async createFile() {
+            const fileName = prompt('Digite o nome do novo arquivo (ex: script.js, style.css, index.html):');
+            if (!fileName) return;
+            
+            // CORREÇÃO 5: Tratamento de nome de arquivo inválido/vazio após o prompt
+            const trimmedFileName = fileName.trim();
+            if (!trimmedFileName) return;
+
+            if (this.files[trimmedFileName]) {
+                this.ui.showNotification('Arquivo já existe!', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/files/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename: trimmedFileName })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    this.ui.logConsole(`Arquivo "${trimmedFileName}" criado com sucesso.`, 'success');
+                    this.ui.showNotification(`Arquivo "${trimmedFileName}" criado.`, 'success');
+                    // Recarrega a lista para incluir o novo arquivo e abri-lo automaticamente
+                    await this.loadFiles();
+                } else {
+                    throw new Error(result.error || 'Erro desconhecido ao criar o arquivo.');
+                }
+            } catch (e) {
+                this.ui.logConsole(`Erro ao criar arquivo: ${e.message}`, 'error');
+                this.ui.showNotification(`Erro ao criar arquivo: ${e.message}`, 'error');
+            }
+        }
+    }
+
+    // ---
+    
+    // ui-manager.js
+    class UIManager {
+        constructor() {
+            this.consoleOutputElement = document.getElementById('console-output');
+            this.previewPanel = document.getElementById('preview-panel');
+            this.terminalPanel = document.getElementById('terminal-panel');
+            this.previewIframe = document.getElementById('preview-iframe');
+            this.notificationContainer = document.getElementById('notification-container');
+            this.runBtn = document.getElementById('run-btn');
+        }
+
+        logConsole(message, type = 'output') {
+            const span = document.createElement('span');
+            span.className = type;
+            span.textContent = `${message}\n`;
+            this.consoleOutputElement.appendChild(span);
+            this.consoleOutputElement.scrollTop = this.consoleOutputElement.scrollHeight;
+        }
+
+        showNotification(message, type = 'info') {
+            // ... (código showNotification inalterado) ...
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            const iconClass = type === 'success' ? 'fas fa-check-circle' :
+                                 type === 'error' ? 'fas fa-times-circle' :
+                                 type === 'warning' ? 'fas fa-exclamation-triangle' :
+                                 'fas fa-info-circle';
+            notification.innerHTML = `<i class="icon ${iconClass}"></i><span>${message}</span>`;
+            this.notificationContainer.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 400);
+            }, 4000);
+        }
+
+        togglePanels(language) {
+            // Mostra Preview para HTML, CSS e JS (front-end) e Terminal para o resto (back-end)
+            if (['html', 'css', 'javascript'].includes(language)) {
+                this.previewPanel.style.display = 'flex';
+                this.terminalPanel.style.display = 'none';
+            } else {
+                this.previewPanel.style.display = 'none';
+                this.terminalPanel.style.display = 'flex';
+            }
+        }
+        
+        async runCode(fileManager) {
+            if (!fileManager.activeFile || !window.editor) { // Valida a existência do editor
+                this.logConsole('Nenhum arquivo ativo ou editor pronto para rodar.', 'warning');
+                this.showNotification('Nenhum arquivo para rodar.', 'warning');
+                return;
+            }
+
+            const code = window.editor.getValue();
+            // Corrigido: pega a linguagem do arquivo ativo
+            const language = fileManager.files[fileManager.activeFile].language; 
+            
+            // Lógica para executar código HTML/CSS/JS no cliente
+            if (['html', 'css', 'javascript'].includes(language)) {
+                if (language !== 'html') {
+                    this.logConsole(`Atenção: Apenas arquivos HTML são visualizados diretamente no preview. Use um arquivo HTML para ver o resultado completo.`, 'warning');
+                }
+                try {
+                    // CORREÇÃO 6: Garante que o iframe não esteja em erro antes de escrever
+                    const doc = this.previewIframe.contentWindow.document;
+                    doc.open();
+                    // Para HTML, apenas escreve o código. Para CSS/JS, espera-se que estejam sendo
+                    // referenciados por um arquivo HTML aberto, mas o comportamento padrão é apenas
+                    // atualizar a visualização se HTML estiver ativo.
+                    if (language === 'html') {
+                        doc.write(code);
+                    } else {
+                        // Poderia ser mais complexo para injeção de CSS/JS, mas
+                        // no escopo atual, apenas o HTML principal faz sentido.
+                        this.logConsole(`Arquivo ${language} aberto. Atualize o arquivo HTML principal para ver as mudanças.`, 'info');
+                    }
+                    doc.close();
+                    this.showNotification('Visualização HTML atualizada.', 'info');
+                } catch (e) {
+                    this.logConsole(`Erro ao renderizar HTML: ${e.message}`, 'error');
+                    this.showNotification(`Erro ao renderizar HTML: ${e.message}`, 'error');
+                }
+                return;
+            }
+
+            // Lógica para enviar código para o servidor (Python, Lineax/SQ)
+            this.logConsole(`Executando ${fileManager.activeFile} no servidor...`, 'info');
+            this.runBtn.disabled = true;
+            this.runBtn.innerHTML = `<span class="loading-spinner"></span> Rodando...`;
+            
+            try {
+                const response = await fetch('/run-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code, language: language })
+                });
+                const result = await response.json();
+                
+                // CORREÇÃO 7: Garante o tratamento de erros HTTP (status != 200)
+                if (response.ok) {
+                    this.logConsole(`Saída:\n${result.output}`, 'output');
+                    this.showNotification('Código executado com sucesso!', 'success');
+                } else {
+                    const errorMessage = result.output || "Erro de execução desconhecido.";
+                    this.logConsole(`Erro de execução (${response.status}):\n${errorMessage}`, 'error');
+                    this.showNotification(`Erro de execução: ${errorMessage}`, 'error');
+                }
+            } catch (e) {
+                this.logConsole(`Erro de conexão com o servidor: ${e.message}`, 'error');
+                this.showNotification(`Erro de conexão: ${e.message}`, 'error');
+            } finally {
+                this.runBtn.disabled = false;
+                this.runBtn.innerHTML = `<i class="fas fa-play"></i> Rodar`;
+            }
+        }
+    }
+
+    // ---
+
+    // ai-module.js
+    class AIModule {
+        constructor(uiManager) {
+            this.iaContainer = document.getElementById('ia-container');
+            this.iaInput = document.getElementById('ia-input');
+            this.isListening = false;
+            this.isThinking = false;
+            this.isSpeaking = false;
+            this.recognition = null;
+            this.ui = uiManager;
+            this.audioPlayer = null;
+        }
+
+        setIAState(state) {
+            this.iaContainer.className = `ia-container ${state}`;
+            // CORREÇÃO 8: Atualiza isListening/isThinking/isSpeaking no setIAState para manter o estado consistente
+            this.isListening = state === 'listening';
+            this.isThinking = state === 'thinking';
+            this.isSpeaking = state === 'speaking';
+        }
+
+        async initAudio() {
+            // CORREÇÃO 9: Evita reinicializar o reconhecimento se já estiver escutando
+            if (this.isListening) return; 
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.error("Seu navegador não suporta Speech Recognition.");
+                this.ui.showNotification("Seu navegador não suporta reconhecimento de voz.", 'error');
+                this.setIAState('idle'); // Certifica-se de que o estado visual está correto
+                return;
+            }
+
+            try {
+                // Tenta obter o acesso ao microfone, mas a inicialização do recognition
+                // pode ser feita sem o stream, a menos que você precise do objeto MediaStream.
+                // Usaremos um padrão que funciona na maioria dos navegadores:
+                
+                this.recognition = new SpeechRecognition();
+                this.recognition.lang = 'pt-BR';
+                this.recognition.continuous = true; // CORREÇÃO 10: Usa 'continuous: true' para melhor experiência, e 'interimResults: true' se quisesse o texto parcial
+                this.recognition.interimResults = false;
+                
+                // Eventos do reconhecimento de voz
+                this.recognition.onstart = () => { this.setIAState('listening'); };
+                this.recognition.onresult = (event) => {
+                    const transcript = Array.from(event.results).map(result => result[0].transcript).join(' ').trim();
+                    // Limpa o resultado da escuta para não processar comandos vazios
+                    if (transcript && event.results[0].isFinal) { 
+                        this.iaInput.value = transcript;
+                        this.sendText(transcript);
+                    }
+                };
+                this.recognition.onerror = (event) => {
+                    console.error("Erro no reconhecimento de voz:", event.error);
+                    this.setIAState('idle');
+                    this.ui.showNotification(`Erro no reconhecimento de voz: ${event.error}`, 'error');
+                };
+                this.recognition.onend = () => {
+                    // CORREÇÃO 11: Lógica de reinício de escuta (se não estiver pensando ou falando)
+                    // Se continuous for true, ele só para se houver um erro ou stop(). 
+                    // Se parou por erro ou por ter sido parado por sendText, a lógica a seguir é ideal.
+                    if (!this.isThinking && !this.isSpeaking) {
+                        // Tenta reiniciar após 1 segundo para evitar loop infinito
+                        setTimeout(() => {
+                           try {
+                               this.recognition.start();
+                           } catch(e) { 
+                               console.warn("Falha ao reiniciar reconhecimento:", e); 
+                           }
+                        }, 1000); 
+                    }
+                };
+                this.recognition.start();
+                this.setIAState('listening');
+                this.ui.logConsole('Agente LX inicializado. Pronto para ouvir.', 'info');
+            } catch (err) {
+                console.error('Erro ao inicializar o reconhecimento de voz.', err);
+                this.setIAState('idle');
+                this.ui.showNotification('Erro: Falha na inicialização do reconhecimento de voz.', 'error');
+            }
+        }
+
+        async sendText(text, isUserQuery = true) {
+            // CORREÇÃO 12: Interrompe o reconhecimento SOMENTE se estiver ativo
+            if (this.recognition && this.isListening) { 
+                 try {
+                     this.recognition.stop();
+                 } catch(e) {
+                     console.warn("Erro ao tentar parar o reconhecimento:", e);
+                 }
+            }
+
+            this.setIAState('thinking');
+            this.iaInput.classList.add('disabled');
+            this.iaInput.placeholder = isUserQuery ? 'Pensando...' : 'Lendo erro...';
+            
+            try {
+                const response = await fetch('/process-audio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success' || data.status === 'redirect') {
+                    
+                    // Lógica para redirecionamento
+                    if (data.status === 'redirect') {
+                        this.ui.logConsole(`Agente LX: ${data.message}`, 'info');
+                        this.ui.showNotification(data.message, 'info');
+                        window.location.href = data.redirect_url;
+                        return; // Interrompe a execução
+                    }
+                    
+                    // Lógica para reprodução de áudio
+                    if (this.audioPlayer) {
+                        this.audioPlayer.pause();
+                        this.audioPlayer = null;
+                    }
+                    
+                    this.setIAState('speaking');
+
+                    this.audioPlayer = new Audio(`/get-audio/${data.audio}`);
+                    this.audioPlayer.onended = () => {
+                        this.isSpeaking = false;
+                        this.iaInput.classList.remove('disabled');
+                        this.iaInput.placeholder = 'Como posso ajudar hoje?';
+                        // Reinicia a escuta após a fala
+                        this.setIAState('listening');
+                        if (this.recognition) this.recognition.start();
+                    };
+                    this.audioPlayer.play();
+                    this.ui.logConsole(`Agente LX: ${data.resposta}`, 'info');
+
+                } else {
+                    throw new Error(data.message || 'Erro ao gerar resposta.');
+                }
+            } catch (err) {
+                console.error('Erro ao enviar texto para o backend para áudio:', err.message);
+                this.ui.logConsole(`Erro: ${err.message}`, 'error');
+                this.ui.showNotification(`Erro: ${err.message}`, 'error');
+            } finally {
+                // Lógica de limpeza para falhas na requisição (caso não entre no .onended)
+                if (this.isThinking) { // Se ainda estiver no estado 'thinking' (erro de rede/backend)
+                    this.iaInput.classList.remove('disabled');
+                    this.iaInput.placeholder = 'Como posso ajudar hoje?';
+                    this.setIAState('idle'); // Volta para idle se não for falar
+                    if (this.recognition) this.recognition.start();
+                }
+            }
+        }
+    }
+    
+    // ---
+    
+    // main.js - Inicialização da IDE
+    document.addEventListener('DOMContentLoaded', () => {
+        // ... (Configuração do Monaco inalterada) ...
+        require.config({
+            paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }
+        });
+
+        require(['vs/editor/editor.main'], () => {
+            window.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+                value: '// Bem-vindo! Crie seu primeiro arquivo.',
+                language: 'plaintext',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                minimap: { enabled: true },
+                fontFamily: 'Fira Code',
+                fontSize: 14,
+                fontLigatures: true,
+            });
+
+            const uiManager = new UIManager();
+            const fileManager = new FileManager(uiManager);
+            const aiModule = new AIModule(uiManager);
+
+            fileManager.loadFiles();
+            
+            // Inicializa a escuta da IA (agora com verificação interna)
+            aiModule.initAudio();
+
+            // Event Listeners
+            document.getElementById('run-btn').addEventListener('click', () => uiManager.runCode(fileManager));
+            document.getElementById('save-btn').addEventListener('click', () => fileManager.saveFile());
+            document.getElementById('add-file-btn').addEventListener('click', () => fileManager.createFile());
+            document.getElementById('ia-input').addEventListener('keypress', (e) => {
+                // CORREÇÃO 13: Previne o envio de texto se a IA estiver pensando ou falando
+                if (e.key === 'Enter' && e.target.value.trim() !== '' && !aiModule.isThinking && !aiModule.isSpeaking) {
+                    aiModule.sendText(e.target.value.trim());
+                    e.target.value = '';
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SquareOS • Exclusivo VIP</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+/* --- VARIÁVEIS DE COR E ESTILO --- */
+:root {
+    --bg-dark: #0A0A14; /* Fundo bem escuro */
+    --text-light: #F0F0FF; /* Texto quase branco */
+    --text-muted: #A0AEC0; /* Texto secundário */
+    
+    /* COR BASE DA LINHA QUE VOCÊ FORNECEU */
+    --primary-purple: #9D4EDD; /* Cor da linha roxa exata */
+    
+    --secondary-magenta: #E040FB; /* Mantido para gradientes, se desejar */
+    --glass-bg-card: rgba(18, 18, 30, 0.6); /* Mais transparente */
+    --glass-nav: rgba(5, 5, 10, 0.95);
+    --border-color-subtle: rgba(157, 78, 221, 0.2); /* Borda mais suave */
+    --transition-speed: 0.5s ease-in-out; /* Animações mais suaves */
+    --vip-gold: #ffffff; /* Ouro para VIP */
+    --vip-yellow: #ffffff;
+}
+
+/* --- ESTILOS BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    overflow-x: hidden;
+    position: relative;
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto; /* Permitir scroll se necessário */
+}
+
+/* --- BACKGROUND AURA (Ajustado para sutil, centralizado e com a nova cor) --- */
+.aura-glow {
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    filter: blur(350px); /* Mais blur */
+    opacity: 0.15; /* Mais sutil */
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, var(--primary-purple), transparent 70%); /* Nova cor */
+    animation: pulseGlow 15s infinite alternate ease-in-out; /* Animação sutil */
+}
+@keyframes pulseGlow {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
+    50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.18; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
+}
+
+
+/* --- CONTAINER PRINCIPAL (Centralizado e Glassy, mais premium) --- */
+.vip-container {
+    background: var(--glass-bg-card);
+    backdrop-filter: blur(30px); /* Mais blur */
+    border-radius: 30px;
+    padding: 70px 50px; /* Mais padding */
+    max-width: 1000px; /* Um pouco mais largo */
+    width: 90%;
+    z-index: 1;
+    border: 2px solid var(--primary-purple); /* Borda com a nova cor */
+    box-shadow: 0 0 50px rgba(157, 78, 221, 0.4); /* Brilho mais intenso */
+    text-align: center; /* Centraliza todo o conteúdo */
+    opacity: 0; /* Escondido para animação de entrada */
+    animation: fadeInScale 1s ease-out forwards;
+    animation-delay: 0.2s;
+    margin: 50px auto; /* Garante que haja um pouco de margem em cima/baixo */
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.vip-header {
+    margin-bottom: 60px; /* Mais espaço */
+}
+
+.vip-title {
+    font-size: 3.8rem; /* Título maior e mais impactante */
+    font-weight: 900; /* Mais bold */
+    color: var(--primary-purple); /* Nova cor */
+    text-shadow: 0 0 20px rgba(157, 78, 221, 0.8); /* Brilho mais forte */
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 3px; /* Mais espaçado */
+    opacity: 0;
+    animation: slideInUp 0.8s ease-out forwards;
+    animation-delay: 0.5s;
+}
+.vip-title i {
+    font-size: 0.8em; /* Ícone um pouco menor em relação ao texto */
+    vertical-align: middle;
+    margin-right: 15px; /* Espaço maior */
+}
+
+
+.vip-subtitle {
+    font-size: 1.4rem; /* Subtítulo maior */
+    color: var(--text-light);
+    font-weight: 300;
+    line-height: 1.4;
+    max-width: 700px; /* Limita largura para melhor leitura */
+    margin: 0 auto;
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 0.8s;
+}
+
+/* --- GRID DE VANTAGENS (Cards Focados, animações individuais) --- */
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 35px; /* Mais espaço entre os cards */
+    margin-top: 40px;
+}
+
+.benefit-card {
+    background: rgba(255, 255, 255, 0.03); /* Fundo quase transparente */
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid var(--border-color-subtle);
+    transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideInUpCard 0.7s ease-out forwards;
+    /* Cada card terá um delay diferente para uma animação escalonada */
+}
+.benefit-card:nth-child(1) { animation-delay: 1.0s; }
+.benefit-card:nth-child(2) { animation-delay: 1.2s; }
+.benefit-card:nth-child(3) { animation-delay: 1.4s; }
+.benefit-card:nth-child(4) { animation-delay: 1.6s; }
+
+
+.benefit-card:hover {
+    transform: translateY(-8px); /* Mais destaque no hover */
+    border-color: var(--primary-purple);
+    box-shadow: 0 15px 40px rgba(157, 78, 221, 0.3); /* Brilho no hover */
+    background: rgba(255, 255, 255, 0.06); /* Um pouco mais visível no hover */
+}
+
+.icon-wrapper {
+    color: var(--primary-purple); /* Nova cor */
+    font-size: 44px; /* Ícones maiores */
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.6)); /* Sombra no ícone */
+}
+
+.benefit-card h4 {
+    font-size: 1.6rem; /* Título do card maior */
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--text-light);
+    line-height: 1.3;
+}
+
+.benefit-card p {
+    color: var(--text-muted);
+    font-size: 1.05rem; /* Texto um pouco maior */
+    line-height: 1.5;
+}
+
+/* Destaque para números e upgrades (com a nova cor) */
+.upgrade-text {
+    font-weight: 700;
+    color: var(--vip-gold); /* Mantém dourado para 'VIP' */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+}
+
+/* --- CALL TO ACTION (Botão Principal e Link de Retorno) --- */
+.cta-container {
+    margin-top: 80px; /* Mais espaço */
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 1.8s;
+}
+
+.btn {
+    border: none;
+    border-radius: 15px; /* Mais arredondado */
+    padding: 18px 45px; /* Mais espaçoso */
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-speed);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* Mais espaço no ícone */
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1.2rem; /* Botão maior */
+    letter-spacing: 1px;
+}
+
+.btn-vip-buy {
+    background: linear-gradient(90deg, var(--vip-gold), var(--vip-yellow)); /* Continua dourado */
+    color: #333; 
+    box-shadow: 0 10px 35px rgba(255, 255, 255, 0.8); /* Brilho forte */
+    animation: pulseVip 2s infinite alternate; /* Animação de pulsação */
+}
+
+.btn-vip-buy:hover {
+    transform: translateY(-5px) scale(1.02); /* Mais destaque no hover */
+    box-shadow: 0 15px 50px rgb(255, 255, 255);
+}
+
+.return-link {
+    display: block;
+    margin-top: 30px; /* Mais espaço */
+    color: var(--text-muted);
+    font-size: 1rem;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.return-link:hover {
+    color: var(--primary-purple); /* Nova cor no hover */
+}
+
+/* --- ANIMAÇÕES CSS --- */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInUpCard {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 992px) {
+    .vip-container {
+        padding: 60px 40px;
+    }
+    .vip-title {
+        font-size: 3.2rem;
+        letter-spacing: 2px;
+    }
+    .vip-subtitle {
+        font-size: 1.2rem;
+    }
+    .benefits-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+    }
+    .btn {
+        font-size: 1.1rem;
+        padding: 15px 35px;
+    }
+}
+
+@media (max-width: 768px) {
+    .vip-container {
+        padding: 50px 30px;
+        width: 95%;
+    }
+    .vip-title {
+        font-size: 2.5rem;
+        letter-spacing: 1px;
+    }
+    .vip-title i {
+        font-size: 0.9em;
+        margin-right: 10px;
+    }
+    .vip-subtitle {
+        font-size: 1rem;
+    }
+    .benefits-grid {
+        grid-template-columns: 1fr; /* Uma coluna em telas menores */
+    }
+    .benefit-card h4 {
+        font-size: 1.4rem;
+    }
+    .icon-wrapper {
+        font-size: 38px;
+    }
+    .cta-container {
+        margin-top: 60px;
+    }
+    .btn-vip-buy {
+        width: 100%;
+        font-size: 1.05rem;
+        padding: 14px 25px;
+    }
+    .return-link {
+        font-size: 0.9rem;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="aura-glow aura-1"></div>
+
+<div class="vip-container">
+    <div class="vip-header">
+        <h2 class="vip-title"><i class="fa-solid fa-crown"></i> Plano SquareOS VIP</h2>
+        <p class="vip-subtitle">Desbloqueie um universo de possibilidades. O plano VIP oferece recursos exclusivos para levar sua experiência ao próximo nível, com performance e capacidade inigualáveis.</p>
+    </div>
+
+    <div class="benefits-grid">
+        
+        <div class="benefit-card">
+            <div class="icon-wrapper"><i class="fa-solid fa-layer-group"></i></div>
+            <h4>Multi-VMs Exclusivas</h4>
+            <p>Eleve sua produtividade. Crie e gerencie até <span class="upgrade-text"> 10 Máquinas Virtuais </span> totalmente isoladas. Ideal para testar, desenvolver e executar projetos paralelos.</p>
+        </div>
+
+        <div class="benefit-card">
+            <div class="icon-wrapper"><i class="fa-solid fa-microchip"></i></div>
+            <h4>Processamento Superior</h4>
+            <p>Sinta a velocidade do nosso chip aprimorado: o <span class="upgrade-text"> SQ-V4-PRO </span>. Experiência sem gargalos, com performance otimizada para suas aplicações mais exigentes.</p>
+        </div>
+
+        <div class="benefit-card">
+            <div class="icon-wrapper"><i class="fa-solid fa-memory"></i></div>
+            <h4>Memória Potencializada</h4>
+            <p>De <span class="upgrade-text">2 GB</span> para um salto impressionante de <span class="upgrade-text"> 10 GB de RAM </span> por máquina. Recursos de sobra para multitarefas complexas e softwares de alto consumo.</p>
+        </div>
+
+        <div class="benefit-card">
+            <div class="icon-wrapper"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <h4>Armazenamento Ilimitado</h4>
+            <p>Expanda seus horizontes. Seu espaço na nuvem é massivamente ampliado de <span class="upgrade-text">15 GB</span> para <span class="upgrade-text"> 50 GB </span>. Seus dados seguros, rápidos e acessíveis a qualquer momento.</p>
+        </div>
+
+    </div>
+
+    <div class="cta-container">
+        <a href="{{ url_for('comprarvip1') }}" class="btn btn-vip-buy">
+            <i class="fa-solid fa-arrow-right"></i> Desbloqueie o VIP Agora
+        </a>
+        <a href="{{ url_for('inicio') }}" class="return-link">
+            <i class="fa-solid fa-angle-left"></i> Voltar para a Página Principal
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

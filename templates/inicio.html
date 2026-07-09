@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square OS - Ecossistema Web Completo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="assets/icones/icones 1/logo.png" type="image/png">
+    <style>
+        /* Variáveis de Cores e Estilos */
+        :root {
+            --bg-dark: #0A0A0A;
+            --bg-medium: #151515;
+            --text-light: #F0F0F0;
+            --text-muted: #A0A0A0;
+            --accent-color: #E0E0E0; /* Branco sutil */
+            --header-bg: rgba(10, 10, 10, 0.7);
+            --card-bg: rgba(20, 20, 20, 0.7);
+            --border-color: rgba(255, 255, 255, 0.05);
+            --shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.4);
+            --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.8);
+            --transition-speed: 0.4s ease-in-out;
+        }
+
+        /* Reset e Base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+        body {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Animações Keyframes */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes subtlePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+            50% { box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.05); }
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-deep);
+            animation: fadeInUp 0.8s forwards;
+        }
+        header .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        header .logo-container img {
+            height: 40px;
+        }
+        header .logo-container span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+        }
+        nav a {
+            margin-left: 2.5rem;
+            font-weight: 500;
+            transition: var(--transition-speed);
+            position: relative;
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width var(--transition-speed);
+        }
+        nav a:hover::after {
+            width: 100%;
+        }
+        nav a:hover {
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Seções Gerais */
+        section {
+            padding: 6rem 5%;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s forwards;
+            opacity: 0;
+        }
+        section:nth-of-type(even) {
+            background-color: var(--bg-medium);
+        }
+        section h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        section .subheading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+        }
+        .text-block {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 2rem;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            animation: fadeInUp 1s 0.3s forwards;
+            opacity: 0;
+        }
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--text-light);
+        }
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .btn {
+            background: var(--text-light);
+            color: var(--bg-dark);
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition-speed);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+            display: inline-block;
+        }
+        .btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .feature {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: var(--transition-speed);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .feature:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+        }
+        .feature .icon {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+            transition: var(--transition-speed);
+        }
+        .feature:hover .icon {
+            color: var(--text-light);
+        }
+        .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .feature p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2.5rem;
+            background: var(--bg-medium);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            font-size: 0.9rem;
+            color: #777;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Media Queries */
+        @media(max-width:1024px){
+            .hero h1 { font-size: 3.5rem; }
+            .hero p { font-size: 1.2rem; }
+            section h2 { font-size: 2.5rem; }
+        }
+        @media(max-width:768px){
+            nav { display: none; }
+            .hero h1 { font-size: 2.8rem; }
+            .hero p { font-size: 1rem; margin-bottom: 2rem;}
+            .btn { padding: 0.8rem 2rem; font-size: 0.9rem; }
+            section { padding: 4rem 4%; }
+            section h2 { font-size: 2rem; margin-bottom: 2.5rem; }
+            .features { grid-template-columns: 1fr; }
+            .feature { padding: 2rem 1.5rem; }
+            .feature .icon { font-size: 3.5rem; margin-bottom: 1rem; }
+            .feature h3 { font-size: 1.3rem; }
+            .feature p { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="assets/icones/icones 1/logo.png" alt="Square OS Logo">
+            <span>Square OS</span>
+        </div>
+        <nav>
+            <a href="#features">Ecossistema</a>
+            <a href="#tech">Tecnologia</a>
+            <a href="#about">Sobre</a>
+            <a href="#beta">Beta</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Square OS</h1>
+            <p>O sistema operacional web que transforma qualquer navegador em um supercomputador completo, integrando nuvem, máquinas virtuais, loja de apps, permitindo que você crie, trabalhe e explore sem limites, de qualquer lugar do mundo.</p>
+             <form action="/codigoacessverifican" method="post" style="text-align:center; margin-top:2rem;">
+    <input type="text" name="codigo" placeholder="Digite o código de acesso" 
+           style="padding:1rem 2rem; border-radius:8px; border:none; margin-bottom:1rem; font-size:1rem;">
+    <br>
+    <button type="submit" 
+            style="background:#F0F0F0; color:#0A0A0A; padding:1rem 2.5rem; border-radius:8px; font-weight:600; cursor:pointer;">
+        Participe da Beta
+    </button>
+</form>
+
+        </div>
+    </section>
+
+    <section id="features">
+        <h2>Ecossistema Completo</h2>
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-cloud icon"></i>
+                <h3>Cloud Integrada</h3>
+                <p>Armazene, acesse e sincronize seus arquivos em qualquer lugar com total segurança, desempenho otimizado e criptografia de ponta.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-store icon"></i>
+                <h3>Loja de Apps Exclusiva</h3>
+                <p>Descubra e utilize aplicativos perfeitamente integrados ao sistema, com um ambiente seguro para desenvolvedores e usuários.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-code icon"></i>
+                <h3>Linguagem de Código Própria</h3>
+                <p>Crie e execute scripts e aplicações diretamente dentro do ecossistema com o suporte completo da linguagem Square Code.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-server icon"></i>
+                <h3>Máquinas Isoladas (VMs)</h3>
+                <p>Execute ambientes virtuais independentes (VMs) a qualquer hora e em qualquer lugar, garantindo a privacidade e a segurança dos seus projetos.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-envelope icon"></i>
+                <h3>Comunicação Integrada</h3>
+                <p>Comunique-se de forma nativa dentro do ecossistema com nosso serviço de mail interno, projetado para ser rápido e altamente seguro.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt icon"></i>
+                <h3>Square Guardian</h3>
+                <p>Proteção avançada e monitoramento em tempo real do seu ecossistema. Segurança total para dados, aplicativos e máquinas virtuais dentro do Square OS.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section id="tech">
+        <h2>Tecnologia e Visão</h2>
+        <p class="text-block">
+            Square OS não é apenas um sistema operacional web — é uma arquitetura revolucionária.
+Construído com as tecnologias web mais modernas e com privacidade e desempenho no núcleo, o Square OS redefine a forma como criadores, empresas e entusiastas interagem com o digital. Nossa plataforma oferece um ambiente seguro, unificado e sem limitações, acessível de qualquer lugar do mundo sem necessidade de instalação. Projetado para todos os públicos, o Square OS capacita você a criar, operar e explorar possibilidades infinitas na web.
+        </p>
+    </section>
+
+    <section id="about">
+        <h2>Sobre o Criador</h2>
+        <p class="text-block">
+            Desenvolvido por <strong>Miguel Viana Oliveira</strong>, um jovem de 14 anos com uma visão de produto e inovação, o Square OS é um projeto solo que demonstra o poder da dedicação e de uma visão clara. A missão é construir o ecossistema web mais completo, que integra ferramentas essenciais em uma única plataforma coesa.
+        </p>
+    </section>
+
+    <section id="beta">
+        <h2>Participe da Beta</h2>
+        <p class="text-block">
+            Estamos na fase final de desenvolvimento da versão beta. Sua participação é fundamental para o sucesso do projeto, ajudando a testar funcionalidades, reportar bugs e moldar o futuro do Square OS. Junte-se à nossa comunidade de early adopters!
+        </p>
+        <div style="text-align:center; margin-top:2rem;">
+            <a href="https://wa.me/5511931025056?text=Quero%20participar%20do%20beta" target="_blank" class="btn">Quero Participar</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Square OS – Todos os direitos reservados.</p>
+        <p>Desenvolvido por Miguel Viana Oliveira.</p>
+    </footer>
+
+    <script>
+        const sections = document.querySelectorAll('section');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.style.animation = 'fadeInUp 1s forwards';
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        sections.forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            observer.observe(section);
+        });
+
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

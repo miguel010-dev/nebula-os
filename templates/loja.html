@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SquareOS App Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Cores para o tema Neuron Network */
+            --bg-dark: #07070E; /* Fundo muito escuro */
+            --text-light: #E8E8FF;
+            --text-muted: #A0AEC0; /* Cinza azulado suave */
+            --primary-glow: #00E6FF; /* Ciano elétrico (mais limpo que neon puro) */
+            --secondary-glow: #8A2BE2; /* Azul violeta (para contraste) */
+            --accent-green: #32CD32; /* Verde limão para instalado */
+            
+            /* Glassmorphism/Card */
+            --glass-bg: rgba(15, 15, 30, 0.4); /* Mais transparente */
+            --card-bg: rgba(20, 20, 45, 0.7); /* Fundo dos cards */
+            --border-subtle: rgba(0, 230, 255, 0.15); /* Borda sutil primary */
+            --border-secondary: rgba(138, 43, 226, 0.15); /* Borda sutil secondary */
+
+            /* Sombras e Brilhos */
+            --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 0 20px rgba(0, 230, 255, 0.6), 0 0 30px rgba(138, 43, 226, 0.2);
+            --shadow-active: 0 0 10px rgba(0, 230, 255, 0.8);
+
+            --transition-fast: 0.2s ease-out;
+            --transition-normal: 0.3s ease-in-out;
+        }
+
+        /* --- Global Reset & Base --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Oxanium', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            overscroll-behavior: none; /* Previne puxar para atualizar em mobile */
+        }
+
+        /* --- Canvas de Fundo de Neurônios --- */
+        #neuron-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.1; /* Sutil */
+            pointer-events: none;
+        }
+
+        main {
+            position: relative; /* Para ficar acima do canvas */
+            z-index: 10;
+            max-width: 1300px;
+            width: 90%;
+            padding: 40px 0;
+        }
+
+        /* --- Barra de Rolagem Customizada --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { 
+            background: linear-gradient(to bottom, var(--primary-glow), var(--secondary-glow)); 
+            border-radius: 4px; 
+        }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, var(--secondary-glow), var(--primary-glow)); }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            margin: 30px 0 50px;
+            color: var(--text-light);
+            text-shadow: var(--shadow-active);
+            letter-spacing: 1px;
+            animation: pulseTextGlow 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseTextGlow {
+            0% { text-shadow: 0 0 10px rgba(0, 230, 255, 0.5); }
+            100% { text-shadow: 0 0 20px rgba(0, 230, 255, 0.9), 0 0 30px rgba(138, 43, 226, 0.3); }
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-glow);
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 i { color: var(--secondary-glow); }
+
+        /* --- UI de Busca e Filtro --- */
+        #filter-bar {
+            width: 100%;
+            margin-bottom: 40px;
+            background: var(--glass-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: blur(8px);
+        }
+        .search-container { width: 100%; position: relative; }
+        .search-container input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            background: rgba(30, 30, 60, 0.7);
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .search-container input:focus { border-color: var(--primary-glow); box-shadow: var(--shadow-active); }
+        .search-container .clear-button { 
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%); 
+            background: none; border: none; color: var(--text-muted); cursor: pointer; 
+            font-size: 1.2rem; padding: 5px; transition: color var(--transition-fast); 
+            display: none;
+        }
+        .search-container .clear-button:hover { color: var(--primary-glow); }
+
+        .category-buttons { 
+            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; 
+            border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 20px;
+        }
+        .category-buttons button {
+            padding: 10px 18px; border: 1px solid var(--border-subtle); border-radius: 8px;
+            font-size: 0.95rem; cursor: pointer; transition: all var(--transition-fast);
+            color: var(--text-light); background: rgba(30, 30, 60, 0.5);
+        }
+        .category-buttons button:hover:not(.active) { background: rgba(0, 230, 255, 0.1); border-color: var(--primary-glow); color: var(--primary-glow); }
+        .category-buttons button.active { 
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow)); 
+            border-color: var(--primary-glow); color: var(--bg-dark); font-weight: 600; 
+            box-shadow: 0 0 15px rgba(0, 230, 255, 0.7); 
+            transform: scale(1.05);
+        }
+
+        /* --- Cards e Container --- */
+        #featured-apps, #apps-container {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Mais espaço */
+            gap: 25px;
+        }
+        
+        #featured-apps {
+            grid-auto-flow: column; /* Para scroll horizontal */
+            overflow-x: auto;
+            padding-bottom: 15px; /* Espaço para a scrollbar */
+            -webkit-overflow-scrolling: touch; /* Suaviza o scroll no iOS */
+        }
+        #featured-apps .app-card {
+            min-width: 280px; /* Cards maiores para destaque */
+            background: linear-gradient(135deg, rgba(20, 20, 45, 0.8), rgba(30, 30, 60, 0.8));
+            border: 1px solid var(--border-secondary);
+        }
+
+
+        .app-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            animation: cardFadeIn 0.6s ease-out forwards;
+        }
+        .app-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-glow);
+        }
+        
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .app-logo { 
+            width: 80px; height: 80px; border-radius: 20%; /* Visual mais moderno */
+            object-fit: cover; margin-bottom: 15px; 
+            border: 2px solid var(--primary-glow); 
+            box-shadow: 0 0 10px rgba(0, 230, 255, 0.4);
+            transition: transform var(--transition-fast);
+        }
+        .app-card:hover .app-logo { transform: scale(1.05); }
+
+        .app-card h3 { 
+            color: var(--text-light); margin: 0; font-size: 1.2rem; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            max-width: 100%; margin-bottom: 5px;
+        }
+        .app-card .developer { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
+        .app-card .description { display: none; }
+        
+        .app-meta { 
+            width: 100%; display: flex; justify-content: space-around; 
+            font-size: 0.85rem; color: var(--text-muted); margin-top: 15px; 
+            padding-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.08); 
+            gap: 10px;
+        }
+        .app-meta .rating { color: #FFD700; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .app-meta .rating i { color: var(--secondary-glow); }
+
+        .action-button {
+            padding: 10px 18px; border-radius: 8px; font-size: 1rem; font-weight: 600;
+            text-align: center; width: 95%; margin-top: 15px;
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow)); 
+            color: var(--bg-dark); border: none;
+            box-shadow: 0 0 10px rgba(0, 230, 255, 0.4);
+            transition: all var(--transition-fast);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .action-button:hover:not([disabled]) { 
+            opacity: 0.9; transform: translateY(-2px); 
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+        .action-button[disabled] { 
+            background: rgba(40, 40, 80, 0.6); 
+            color: var(--text-muted); 
+            box-shadow: none; 
+            cursor: not-allowed; 
+            border: 1px solid var(--border-subtle);
+        }
+
+        .app-badge { 
+            position: absolute; top: 12px; right: 12px; padding: 5px 10px; border-radius: 6px; 
+            font-size: 0.75rem; font-weight: 700; line-height: 1; z-index: 5; 
+            color: var(--bg-dark);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+        }
+        .badge-purchased { background: var(--accent-green); } /* Verde vivo */
+        .badge-free { background: var(--primary-glow); } /* Ciano para grátis */
+        
+        /* --- Modal de Detalhes --- */
+        #app-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+        }
+        #app-modal.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: rgba(20, 20, 45, 0.9); border: 1px solid var(--primary-glow);
+            border-radius: 20px; width: 90%; max-width: 700px; padding: 35px;
+            box-shadow: 0 0 40px rgba(0, 230, 255, 0.7); position: relative;
+            transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            color: var(--text-light);
+        }
+        #app-modal.visible .modal-content { transform: scale(1); }
+        .modal-close { 
+            position: absolute; top: 15px; right: 15px; background: transparent; border: none; 
+            color: var(--text-muted); font-size: 1.8rem; cursor: pointer; 
+            transition: color 0.2s, transform 0.2s; 
+        }
+        .modal-close:hover { color: var(--secondary-glow); transform: rotate(90deg); }
+
+        .modal-content .app-logo { 
+            width: 100px; height: 100px; border-radius: 25%; /* Logo maior e quadrado arredondado */
+            float: left; margin: 0 30px 15px 0; 
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 12px rgba(0, 230, 255, 0.6);
+        }
+        .modal-content #modal-app-name { 
+            font-size: 2.2rem; margin-top: 0; line-height: 1.2;
+            color: var(--primary-glow);
+        }
+        .modal-content #modal-app-dev { 
+            font-size: 1.1rem; color: var(--text-muted); margin-bottom: 5px;
+        }
+        .modal-content .app-meta { 
+            border: none; padding-top: 5px; 
+            justify-content: flex-start; gap: 20px;
+        }
+        .modal-content #modal-full-desc { 
+            color: var(--text-light); margin-top: 25px; 
+            max-height: 280px; overflow-y: auto; padding-right: 15px;
+            line-height: 1.6; font-size: 1rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 20px;
+        }
+        .modal-content #modal-buy-button-container .action-button {
+            margin-top: 30px;
+            box-shadow: 0 0 15px rgba(0, 230, 255, 0.8);
+        }
+        .modal-content #modal-buy-button-container .action-button:hover:not([disabled]) {
+            box-shadow: 0 0 20px var(--primary-glow), 0 0 30px var(--secondary-glow);
+        }
+        
+        /* --- Mensagens Flash --- */
+        .flash-messages { 
+            list-style: none; padding: 0; width: 100%; max-width: 1300px; 
+            margin: -20px auto 30px auto; 
+            position: relative; z-index: 11; /* Acima de outros elementos */
+        }
+        .flash-messages li { 
+            padding: 15px; margin-bottom: 15px; border-radius: 12px; 
+            text-align: center; font-weight: 600; 
+            box-shadow: var(--shadow-card);
+            backdrop-filter: blur(5px);
+        }
+        .flash-messages .success { background: rgba(50, 205, 50, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); }
+        .flash-messages .error { background: rgba(255, 69, 0, 0.2); border: 1px solid #FF4500; color: #FF4500; }
+        .flash-messages .info { background: rgba(0, 204, 255, 0.2); border: 1px solid var(--primary-glow); color: var(--primary-glow); }
+
+
+        /* --- Media Queries --- */
+        @media (max-width: 992px) {
+            h1 { font-size: 2.5rem; margin: 20px 0 40px; }
+            h2 { font-size: 1.6rem; }
+            #featured-apps .app-card { min-width: 240px; }
+            #apps-container { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+            .modal-content { max-width: 95%; padding: 25px; }
+            .modal-content .app-logo { width: 80px; height: 80px; margin: 0 20px 10px 0; }
+            .modal-content #modal-app-name { font-size: 2rem; }
+        }
+
+        @media (max-width: 768px) {
+            main { width: 95%; padding: 20px 0; }
+            h1 { font-size: 2rem; margin: 20px 0 30px; }
+            h2 { font-size: 1.4rem; }
+            #featured-apps .app-card { min-width: 200px; }
+            #apps-container { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+            .app-card { padding: 15px; }
+            .app-logo { width: 60px; height: 60px; }
+            .app-card h3 { font-size: 1.1rem; }
+            .category-buttons { justify-content: center; }
+            .action-button { font-size: 0.9rem; padding: 8px 12px; }
+            .modal-content .app-logo { float: none; margin: 0 auto 15px auto; display: block; }
+            .modal-content #modal-app-name { text-align: center; font-size: 1.8rem; }
+            .modal-content #modal-app-dev { text-align: center; display: block; margin-bottom: 10px; }
+            .modal-content .app-meta { justify-content: center; }
+            .modal-content #modal-full-desc { max-height: 180px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.2rem; }
+            #filter-bar { padding: 15px; }
+            .search-container input { padding: 10px 15px; font-size: 0.9rem; }
+            .category-buttons button { padding: 8px 12px; font-size: 0.85rem; }
+            #featured-apps .app-card { min-width: 180px; }
+            #apps-container { grid-template-columns: 1fr; } /* Pilha em telas muito pequenas */
+            .app-card { padding: 12px; }
+            .app-logo { width: 50px; height: 50px; }
+            .app-card h3 { font-size: 1rem; }
+            .action-button { font-size: 0.85rem; padding: 7px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="neuron-canvas"></canvas>
+
+    <main>
+        <h1><i class="fas fa-store"></i> SquareOS App Market</h1>
+        
+
+
+        <div id="filter-bar">
+            <div class="search-container">
+                <input type="text" id="app-search" placeholder="Buscar apps e jogos..." onkeyup="handleSearchInput()">
+                <button id="clear-search-btn" class="clear-button" onclick="clearSearch()"><i class="fas fa-times-circle"></i></button>
+            </div>
+
+            <div class="category-buttons">
+                <button class="active" data-filter="all" onclick="filterByCategory(this)">Todos</button>
+                <button data-filter="purchased" onclick="filterByCategory(this)">Instalados</button>
+                <button data-filter="free" onclick="filterByCategory(this)">Grátis</button>
+                <button data-filter="tools" onclick="filterByCategory(this)">Ferramentas</button>
+                <button data-filter="games" onclick="filterByCategory(this)">Jogos</button>
+                <button data-filter="utility" onclick="filterByCategory(this)">Utilidades</button>
+            </div>
+        </div>
+
+        <div id="featured-section">
+            <h2><i class="fas fa-rocket"></i> Destaques</h2>
+            <div id="featured-apps">
+                {% for app in apps[:3] %} {# Mostra os 3 primeiros apps como destaque #}
+                    {% set app_is_purchased = app.id in compras %}
+                    {% set app_is_free = app.price is defined and app.price == 0 %}
+                    
+                    <div 
+                        class="app-card" 
+                        data-app-name="{{ app.nomeapp | lower }}" 
+                        data-app-desc="{{ app.descricao | lower }}" 
+                        data-app-category="{{ app.category | lower or 'uncategorized' }}" 
+                        data-app-status="{{ 'purchased' if app_is_purchased else 'available' }}"
+                        data-app-price-zero="{{ 'true' if app_is_free else 'false' }}"
+                        data-full-desc="{{ app.descricao }}"
+                        data-logo-src="{{ app.logoapp }}"
+                        data-dev-name="{{ app.developer or 'SquareOS' }}"
+                        data-rating="{{ app.rating or 'N/A' }}"
+                        data-version="{{ app.version or '1.0' }}"
+                        onclick="openModal(this)"
+                    >
+                        {% if app_is_purchased %}
+                            <span class="app-badge badge-purchased"><i class="fas fa-check"></i></span>
+                        {% elif app_is_free %}
+                            <span class="app-badge badge-free"><i class="fas fa-gift"></i></span>
+                        {% endif %}
+
+                        <img class="app-logo" src="{{ app.logoapp }}" alt="{{ app.nomeapp }} Logo">
+                        <h3>{{ app.nomeapp }}</h3>
+                        <span class="developer">{{ app.developer or "SquareOS" }}</span>
+                        
+                        <div class="app-meta">
+                            <span class="rating"><i class="fas fa-star"></i> {{ app.rating or 'N/A' }}</span>
+                            <span>{{ 'GRÁTIS' if app_is_free else 'R$ 9,99' }}</span>
+                        </div>
+
+                        <div onclick="event.stopPropagation()" style="width: 100%;">
+                            {% if app_is_purchased %}
+                                <button class="action-button" disabled><i class="fas fa-check-circle"></i> INSTALADO</button>
+                            {% else %}
+                                <form action="{{ url_for('comprar_app', app_id=app.id) }}" method="POST" style="margin: 0; width: 100%;">
+                                    <button type="submit" class="action-button"> 
+                                        <i class="fas fa-download"></i> BAIXAR
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <h2><i class="fas fa-th-large"></i> Todos os Apps</h2>
+        <div id="apps-container">
+            {% for app in apps %}
+                {% set app_is_purchased = app.id in compras %}
+                {% set app_is_free = app.price is defined and app.price == 0 %}
+                
+                <div 
+                    class="app-card" 
+                    data-app-name="{{ app.nomeapp | lower }}" 
+                    data-app-desc="{{ app.descricao | lower }}" 
+                    data-app-category="{{ app.category | lower or 'uncategorized' }}" 
+                    data-app-status="{{ 'purchased' if app_is_purchased else 'available' }}"
+                    data-app-price-zero="{{ 'true' if app_is_free else 'false' }}"
+                    data-full-desc="{{ app.descricao }}"
+                    data-logo-src="{{ app.logoapp }}"
+                    data-dev-name="{{ app.developer or 'SquareOS' }}"
+                    data-rating="{{ app.rating or 'N/A' }}"
+                    data-version="{{ app.version or '1.0' }}"
+                    onclick="openModal(this)"
+                >
+                    {% if app_is_purchased %}
+                        <span class="app-badge badge-purchased"><i class="fas fa-check"></i></span>
+                    {% elif app_is_free %}
+                        <span class="app-badge badge-free"><i class="fas fa-gift"></i></span>
+                    {% endif %}
+
+                    <img class="app-logo" src="{{ app.logoapp }}" alt="{{ app.nomeapp }} Logo">
+                    <h3>{{ app.nomeapp }}</h3>
+                    <span class="developer">{{ app.developer or "SquareOS" }}</span>
+                    
+                    <div class="app-meta">
+                        <span class="rating"><i class="fas fa-star"></i> {{ app.rating or 'N/A' }}</span>
+                        <span>{{ 'GRÁTIS' if app_is_free else 'R$ 9,99' }}</span>
+                    </div>
+
+                    <div onclick="event.stopPropagation()" style="width: 100%;">
+                        {% if app_is_purchased %}
+                            <button class="action-button" disabled><i class="fas fa-check-circle"></i> INSTALADO</button>
+                        {% else %}
+                            <form action="{{ url_for('comprar_app', app_id=app.id) }}" method="POST" style="margin: 0; width: 100%;">
+                                <button type="submit" class="action-button"> 
+                                    <i class="fas fa-download"></i> BAIXAR
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div id="no-results" class="app-card hidden" style="grid-column: 1 / -1; padding: 40px; border: 2px dashed var(--border-secondary); background: var(--card-bg);">
+                <i class="fas fa-search-minus" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 15px;"></i>
+                <p style="font-size: 1.1rem; color: var(--text-light);">Nenhum app correspondente foi encontrado.</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            
+            <div style="overflow: hidden; display: flex; flex-direction: column; align-items: flex-start;">
+                <img class="app-logo" id="modal-app-logo" src="" alt="App Logo">
+                <div style="flex-grow: 1;">
+                    <h3 id="modal-app-name" style="margin-bottom: 5px;"></h3>
+                    <span class="developer" id="modal-app-dev" style="display: block; margin-bottom: 10px;"></span>
+                    <div class="app-meta" style="border: none; padding: 0; margin: 0; justify-content: flex-start; gap: 20px;">
+                        <span class="rating" id="modal-app-rating-span"><i class="fas fa-star"></i> N/A</span>
+                        <span id="modal-app-version-span">Versão: 1.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="color: var(--secondary-glow); margin-top: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; font-size: 1.4rem;">Descrição Completa</h4>
+            <p id="modal-full-desc"></p>
+            
+            <div id="modal-buy-button-container" onclick="event.stopPropagation()"></div>
+        </div>
+    </div>
+
+<script>
+    const appSearch = document.getElementById('app-search');
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+    const categoryButtons = document.querySelectorAll('.category-buttons button');
+    const appModal = document.getElementById('app-modal');
+    const allAppCards = document.querySelectorAll('#apps-container .app-card:not(#no-results)');
+    const featuredAppCards = document.querySelectorAll('#featured-apps .app-card:not(#no-results)');
+
+
+    let currentCategoryFilter = 'all';
+
+    function handleSearchInput() {
+        clearSearchBtn.style.display = appSearch.value.trim().length > 0 ? 'block' : 'none';
+        filterApps();
+    }
+    
+    function clearSearch() {
+        appSearch.value = '';
+        handleSearchInput();
+        appSearch.focus();
+    }
+
+    function filterApps() {
+        const searchText = appSearch.value.toLowerCase().trim();
+        let resultsFound = false;
+        let visibleCardCount = 0;
+
+        // Função auxiliar para filtrar uma lista de cards
+        const filterCardList = (cardList, showFeatured) => {
+            cardList.forEach(card => {
+                const name = card.dataset.appName;
+                const category = card.dataset.appCategory;
+                const status = card.dataset.appStatus;
+                const isFree = card.dataset.appPriceZero === 'true';
+                
+                const matchesSearch = name.includes(searchText); 
+                
+                let matchesCategory = false;
+                switch (currentCategoryFilter) {
+                    case 'all': matchesCategory = true; break;
+                    case 'purchased': matchesCategory = (status === 'purchased'); break;
+                    case 'free': matchesCategory = isFree; break;
+                    default: matchesCategory = (category.includes(currentCategoryFilter)); break; 
+                }
+
+                if (matchesSearch && matchesCategory) {
+                    card.classList.remove('hidden');
+                    card.style.animationDelay = `${visibleCardCount * 0.05}s`;
+                    resultsFound = true;
+                    visibleCardCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        };
+
+        // Filtra os apps principais
+        filterCardList(allAppCards);
+
+        // Esconde ou mostra a seção de destaques com base na busca
+        const featuredSection = document.getElementById('featured-section');
+        if (searchText === '' && currentCategoryFilter === 'all') {
+            featuredSection.style.display = 'block'; // Mostra destaques sem busca ou filtro
+             // Reinicia os delays de animação para featured apps
+             featuredAppCards.forEach((card, index) => {
+                card.classList.remove('hidden');
+                card.style.animationDelay = `${index * 0.05}s`;
+            });
+        } else {
+            featuredSection.style.display = 'none'; // Esconde destaques com busca ou filtro
+        }
+
+
+        document.getElementById('no-results')?.classList.toggle('hidden', resultsFound);
+    }
+    
+    function filterByCategory(button) {
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        currentCategoryFilter = button.getAttribute('data-filter');
+        filterApps();
+    }
+    
+    function openModal(cardElement) {
+        // Redefine o estilo para flex-start para o conteúdo do modal ao abrir
+        const modalHeaderContent = appModal.querySelector('.modal-content > div:first-child');
+        if (window.innerWidth <= 768) { // Apenas em telas menores
+            modalHeaderContent.style.alignItems = 'center';
+            modalHeaderContent.querySelector('#modal-app-name').style.textAlign = 'center';
+            modalHeaderContent.querySelector('#modal-app-dev').style.textAlign = 'center';
+        } else {
+             modalHeaderContent.style.alignItems = 'flex-start';
+             modalHeaderContent.querySelector('#modal-app-name').style.textAlign = 'left';
+             modalHeaderContent.querySelector('#modal-app-dev').style.textAlign = 'left';
+        }
+
+
+        appModal.querySelector('#modal-app-logo').src = cardElement.dataset.logoSrc;
+        appModal.querySelector('#modal-app-name').textContent = cardElement.querySelector('h3').textContent;
+        appModal.querySelector('#modal-app-dev').textContent = `Desenvolvedor: ${cardElement.dataset.devName}`;
+        appModal.querySelector('#modal-full-desc').textContent = cardElement.dataset.fullDesc;
+        appModal.querySelector('#modal-app-rating-span').innerHTML = `<i class="fas fa-star"></i> ${cardElement.dataset.rating}`;
+        appModal.querySelector('#modal-app-version-span').textContent = `Versão: ${cardElement.dataset.version}`;
+        
+        const actionContainer = cardElement.querySelector('[onclick="event.stopPropagation()"]').innerHTML;
+        const modalButtonContainer = appModal.querySelector('#modal-buy-button-container');
+        modalButtonContainer.innerHTML = actionContainer;
+        modalButtonContainer.querySelector('button').style.marginTop = '20px';
+        modalButtonContainer.querySelector('button').classList.add('action-button'); 
+
+        appModal.classList.add('visible');
+    }
+
+    function closeModal() {
+        appModal.classList.remove('visible');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        filterApps(); 
+        handleSearchInput(); 
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && appModal.classList.contains('visible')) {
+                closeModal();
+            }
+        });
+    });
+
+    // --- NEURON NETWORK CANVAS SCRIPT ---
+    const canvas = document.getElementById('neuron-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const numParticles = 80;
+    const maxDistance = 100; // Distância máxima para conectar partículas
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = Math.random() * 0.5 - 0.25; // Velocidade aleatória
+            this.vy = Math.random() * 0.5 - 0.25;
+            this.radius = Math.random() * 1.5 + 0.5; // Tamanho pequeno
+            this.color = `rgba(0, 230, 255, ${Math.random() * 0.7 + 0.3})`; // Tons de ciano
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Mantém partículas dentro da tela
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height));
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+
+            // Desenha linhas entre partículas próximas
+            for (let j = i + 1; j < particles.length; j++) {
+                const p1 = particles[i];
+                const p2 = particles[j];
+                const distance = Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2);
+
+                if (distance < maxDistance) {
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.strokeStyle = `rgba(0, 230, 255, ${1 - (distance / maxDistance)})`; // Opacidade decrescente
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        initParticles(); // Re-inicializa partículas para se ajustar ao novo tamanho
+    });
+
+    resizeCanvas();
+    initParticles();
+    animate();
+</script>
+</body>
+</html>

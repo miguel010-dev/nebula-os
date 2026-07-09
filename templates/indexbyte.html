@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Byte Mail</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #e0e0e0; }
+
+  /* Popup */
+  .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index: 999; }
+  .popup-content { background: #1f1f1f; padding: 20px 30px; border-radius: 12px; text-align: center; max-width: 400px; box-shadow: 0 6px 20px rgba(0,0,0,0.7); }
+  .popup-content h2 { color: #ff3b3b; margin-bottom: 12px; }
+  .popup-content p { font-size: 14px; margin-bottom: 20px; color: #ccc; }
+  .popup-content button { padding: 8px 16px; background: #1a73e8; border:none; color:#fff; border-radius:6px; cursor:pointer; font-size:14px; }
+  .popup-content button:hover { background: #155ab6; }
+
+  /* Navbar */
+  .navbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #1f1f1f; border-bottom: 1px solid #333; }
+  .logo { color: #ff3b3b; font-weight: bold; font-size: 20px; }
+  .menu-top a { color: #e0e0e0; margin: 0 8px; text-decoration: none; font-size: 14px; }
+  .menu-top a:hover { color: #ff3b3b; }
+  .profile { width: 36px; height: 36px; border-radius: 50%; background-size: cover; background-position: center; cursor: pointer; border: none; }
+
+  /* Layout principal */
+  .main { display: flex; flex: 1; min-height: calc(100vh - 50px); }
+
+  /* Sidebar */
+  .sidebar { width: 220px; background: #1f1f1f; padding: 20px 10px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid #333; }
+  .sidebar a { color: #e0e0e0; padding: 12px; border-radius: 8px; text-decoration: none; transition: 0.2s; font-size: 14px; font-weight: 500; }
+  .sidebar a:hover { background: #2c2c2c; }
+
+  /* Emails */
+  .emails { flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; background: #111; position: relative; }
+  .email-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-radius: 10px; background: #1f1f1f; cursor: pointer; transition: 0.2s; }
+  .email-item:hover { background: #2c2c2c; }
+  .email-left { display: flex; align-items: center; gap: 12px; }
+  .email-avatar { width: 36px; height: 36px; border-radius: 50%; background: #444; }
+  .email-details { display: flex; flex-direction: column; }
+  .email-address { font-weight: 600; font-size: 14px; }
+  .email-preview { font-size: 12px; color: #aaa; }
+  .email-time { font-size: 12px; color: #aaa; }
+
+  /* Floating send button */
+  .send { width: 55px; height: 55px; border-radius: 50%; border: none; background: #ff3b3b; color: #fff; font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; bottom: 20px; right: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transition: 0.3s; }
+  .send:hover { background: #d32f2f; transform: scale(1.05); }
+
+  /* Compose & read boxes */
+  .compose-box { position: fixed; bottom: 20px; right: 20px; width: 500px; max-width: 95%; height: 400px; background: #1f1f1f; border-radius: 12px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.7); z-index: 100; }
+  .compose-header { background: #2c2c2c; padding: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px; color: #fff; }
+  .compose-body { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+  .compose-body input, .compose-body textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #111; color: #e0e0e0; font-size: 14px; resize: none; }
+  .compose-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 12px; }
+  .btn { padding: 6px 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; }
+  .btn-send { background: #1a73e8; color: #fff; }
+  .btn-send:hover { background: #155ab6; }
+  .btn-close { background: #444; color: #fff; }
+  .btn-close:hover { background: #333; }
+
+  #readBox .compose-body p { color: #e0e0e0; }
+
+  @media(max-width: 768px){
+    .main { flex-direction: column; }
+    .sidebar { width: 100%; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #333; }
+    .sidebar a { flex: 1; text-align: center; }
+    .emails { padding: 10px; }
+    .compose-box { width: 95%; height: 60%; bottom: 10%; right: 2.5%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Popup inicial -->
+<div class="popup" id="popup">
+  <div class="popup-content">
+    <h2>🚧 Atenção!</h2>
+    <p>O Byte Mail está em fase de teste.<br>
+    Atualmente, só é possível enviar e-mails para usuários com domínio <strong>@bytemail.com</strong>.</p>
+    <button id="closePopup">Entendi</button>
+  </div>
+</div>
+
+<header class="navbar">
+  <div class="navbar-left">
+    <p class="logo">BYTE MAIL</p>
+    <nav class="menu-top">
+      <a href="#">Enviados</a>
+      <a href="#">Recebidos</a>
+      <a href="#">Agendados</a>
+    </nav>
+  </div>
+
+  <!-- Botão da foto do usuário -->
+  <form action="/perfil" method="get" style="margin:0;">
+    <button type="submit" class="profile" style="background-image: url('{{ user['foto'] }}');"></button>
+  </form>
+</header>
+
+<div class="main">
+  <aside class="sidebar">
+    <a href="#">📥 Caixa de Entrada</a>
+    <a href="#">⭐ Importante</a>
+    <a href="#">📤 Enviados</a>
+    <a href="#">📅 Agendados</a>
+    <a href="#">🚫 Spam</a>
+  </aside>
+
+  <section class="emails" id="emailsList">
+    <button id="send" class="send">+</button>
+  </section>
+</div>
+
+<div class="compose-box" id="composeBox">
+  <div class="compose-header">
+    Novo e-mail
+    <button class="btn-close" id="closeCompose">X</button>
+  </div>
+  <div class="compose-body">
+    <input type="email" id="para" placeholder="Para">
+    <input type="text" id="assunto" placeholder="Assunto">
+    <textarea rows="6" id="mensagem" placeholder="Escreva sua mensagem..."></textarea>
+  </div>
+  <div class="compose-footer">
+    <button class="btn btn-send" id="btnEnviar">Enviar</button>
+    <button class="btn btn-close" id="cancelCompose">Cancelar</button>
+  </div>
+</div>
+
+<div class="compose-box" id="readBox">
+  <div class="compose-header">
+    <span id="readSubject">Assunto...</span>
+    <button class="btn-close" id="closeRead">X</button>
+  </div>
+  <div class="compose-body">
+    <p><strong>De:</strong> <span id="readFrom"></span></p>
+    <p id="readMessage"></p>
+  </div>
+</div>
+
+<script>
+// Popup
+document.getElementById("closePopup").addEventListener("click", () => {
+  document.getElementById("popup").style.display = "none";
+});
+
+// Botões Compose
+const composeBox = document.getElementById("composeBox");
+document.getElementById("send").addEventListener("click", () => composeBox.style.display = "flex");
+document.getElementById("closeCompose").addEventListener("click", () => composeBox.style.display = "none");
+document.getElementById("cancelCompose").addEventListener("click", () => composeBox.style.display = "none");
+
+// Botão fechar leitura
+document.getElementById("closeRead").addEventListener("click", () => {
+  document.getElementById("readBox").style.display = "none";
+});
+
+// Enviar email
+document.getElementById("btnEnviar").addEventListener("click", () => {
+  const para = document.getElementById("para").value.trim();
+  const assunto = document.getElementById("assunto").value;
+  const mensagem = document.getElementById("mensagem").value;
+
+  if(!para.endsWith("@bytemail.com")){
+    alert("Só é possível enviar emails para endereços que terminam com @bytemail.com");
+    return;
+  }
+
+  fetch("/enviar", {
+    method: "POST",
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    body: new URLSearchParams({ para, assunto, mensagem })
+  })
+  .then(res => res.json())
+  .then(resp => {
+    alert(resp.message);
+    if(resp.status === "success"){
+      composeBox.style.display = "none";
+      carregarEmails();
+    }
+  });
+});
+
+// Carregar emails
+function carregarEmails() {
+  fetch("/api/emails")
+    .then(res => res.json())
+    .then(data => {
+      const emailsList = document.getElementById("emailsList");
+      emailsList.innerHTML = '<button id="send" class="send">+</button>';
+      data.forEach(email => {
+        const div = document.createElement("div");
+        div.classList.add("email-item");
+        div.innerHTML = `
+          <div class="email-left">
+            <div class="email-avatar"></div>
+            <div class="email-details">
+              <span class="email-address">${email.remetente}</span>
+              <span class="email-preview">${email.assunto || "(sem assunto)"} - ${email.mensagem}</span>
+            </div>
+          </div>
+          <span class="email-time">${email.hora}</span>
+        `;
+        div.addEventListener("click", () => abrirEmail(email.id));
+        emailsList.appendChild(div);
+      });
+
+      document.getElementById("send").addEventListener("click", () => composeBox.style.display = "flex");
+    });
+}
+
+// Abrir email
+function abrirEmail(id) {
+  fetch(`/api/email/${id}`)
+    .then(res => res.json())
+    .then(email => {
+      document.getElementById("readSubject").textContent = email.assunto || "(sem assunto)";
+      document.getElementById("readFrom").textContent = email.remetente;
+      document.getElementById("readMessage").textContent = email.mensagem;
+      document.getElementById("readBox").style.display = "flex";
+    });
+}
+
+// Inicializa
+carregarEmails();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SquareOS Admin | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #1f2226;
+            --sidebar-dark: #2a2e33;
+            --card-dark: #32373c;
+            --text-light: #e0e0e0;
+            --primary-accent: #10b981; 
+            --primary-accent-hover: #059669;
+            --success-green: #34d399;
+            --danger-red: #ef4444;
+            --warning-orange: #f59e0b;
+            --info-blue: #3b82f6;
+            --border-color: #4b5563;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --card-shadow: 0 4px 12px var(--shadow-color);
+            --element-spacing: 20px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-dark);
+            box-shadow: 4px 0 10px var(--shadow-color);
+            padding: var(--element-spacing) 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            flex-shrink: 0;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: calc(var(--element-spacing) * 2);
+        }
+        .sidebar-header h2 {
+            color: var(--primary-accent);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin: 0;
+        }
+        .sidebar-toggle {
+            display: none; /* Escondido por padrão */
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar nav ul li a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 15px var(--element-spacing);
+            color: var(--text-light); text-decoration: none;
+            transition: all 0.2s; font-weight: 600; opacity: 0.9; font-size: 0.95rem;
+        }
+        .sidebar nav ul li a.active {
+            background-color: var(--card-dark);
+            color: var(--primary-accent);
+            box-shadow: inset 5px 0 0 0 var(--primary-accent);
+            opacity: 1;
+        }
+        .sidebar .sidebar-footer {
+            padding: var(--element-spacing);
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: calc(var(--element-spacing) * 1.5);
+            overflow-y: auto;
+            position: relative;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--element-spacing);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .page-header h1 { font-size: 2rem; color: var(--primary-accent); margin: 0; }
+        .page-header p { margin: 0; font-size: 1rem; opacity: 0.7;}
+        
+        .page-content { animation: fadeIn 0.5s; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .stat-card {
+            background-image: linear-gradient(145deg, var(--card-dark), #3c4147);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, border-color 0.2s;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover { transform: translateY(-4px); border-color: var(--primary-accent); }
+        .stat-card .header { display: flex; justify-content: space-between; align-items: center; }
+        .stat-card h2 { font-size: 1rem; text-transform: uppercase; opacity: 0.7; margin: 0; }
+        .stat-card p { font-size: 2.5rem; margin: 10px 0 0 0; font-weight: 700; z-index: 2; }
+        .stat-card .icon-bg {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 6rem;
+            opacity: 0.08;
+            transform: rotate(-15deg);
+            transition: opacity 0.3s;
+        }
+        .stat-card:hover .icon-bg { opacity: 0.15; }
+
+        .data-table { 
+            width: 100%;
+            background-color: var(--card-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-top: var(--element-spacing);
+            border-collapse: collapse;
+        }
+        .data-table th, .data-table td { 
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        .data-table th { 
+            background-color: rgba(0, 0, 0, 0.2);
+            font-size: 0.85rem;
+            color: var(--primary-accent);
+        }
+        .data-table tr:hover { background-color: #3f444c; }
+
+        #logs-output {
+            height: 500px;
+            background-color: #121212;
+            color: #ccc;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            overflow-y: scroll;
+        }
+
+        button { border: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Poppins', sans-serif; font-weight: 600; }
+        .btn-primary { background-color: var(--primary-accent); color: #fff; padding: 10px 15px; border-radius: 6px; }
+        .btn-primary:hover { background-color: var(--primary-accent-hover); }
+        
+        .status-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: #fff;
+            z-index: 1000;
+            font-weight: 600;
+            animation: slideInUp 0.3s ease-out;
+        }
+        @keyframes slideInUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            z-index: 1001;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background-color: var(--card-dark);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--card-shadow);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { margin: 0; color: var(--primary-accent); }
+        .close-modal { background: none; border: none; color: var(--text-light); font-size: 1.5rem; cursor: pointer; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--bg-dark); color: var(--text-light); }
+        
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px;
+            }
+            .sidebar.collapsed nav { display: none; }
+            .sidebar-toggle { display: block; }
+            .main-content { padding: var(--element-spacing); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h2><i class="fas fa-cube"></i> SQUARE OS PRO</h2>
+    </div>
+    <button class="sidebar-toggle" id="sidebar-toggle-btn"><i class="fas fa-bars"></i></button>
+    <nav>
+        <ul>
+            <li><a href="/admin/dashboard" class="nav-link" data-route="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="/admin/users" class="nav-link" data-route="/admin/users"><i class="fas fa-user-shield"></i> Gerenciar Usuários</a></li>
+            <form action="/cadastrar-app" method="post">
+            <button type="submit">Cadastrar App</button>
+            </form>
+            <li><a href="/admin/logs" class="nav-link" data-route="/admin/logs"><i class="fas fa-clipboard-list"></i> Logs do Sistema</a></li>
+            <li><a href="/admin/settings" class="nav-link" data-route="/admin/settings"><i class="fas fa-file-code"></i> Arquivos de Config</a></li>
+            <li><a href="/admin/codigo" class="nav-link" data-route="/admin/codigo"><i class="fas fa-code"></i> Visualizar Projeto</a></li>
+        </ul>
+    </nav>
+    <div class="sidebar-footer">
+        © 2025 SquareOS
+    </div>
+</div>
+
+<div class="main-content" id="app-root">
+    <div class="page-content" id="page-container">
+        </div>
+    <div id="status-message" class="status-message" style="display:none;"></div>
+    <div id="loading-spinner" class="loading-spinner" style="display:none;"></div>
+</div>
+
+<div id="add-user-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Usuário</h2>
+            <button class="close-modal" id="close-modal-btn">&times;</button>
+        </div>
+        <form id="add-user-form">
+            <div class="form-group">
+                <label for="new-user-name">Nome</label>
+                <input type="text" id="new-user-name" required>
+            </div>
+            <div class="form-group">
+                <label for="new-user-email">Email</label>
+                <input type="email" id="new-user-email" required>
+            </div>
+            <div class="form-group">
+                <label for="new-user-password">Senha</label>
+                <input type="password" id="new-user-password" required>
+            </div>
+            <div class="form-group">
+                <label for="new-user-cargo">Cargo</label>
+                <select id="new-user-cargo">
+                    <option value="user">User</option>
+                    <option value="moderator">Moderator</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="submit" class="btn-primary"><i class="fas fa-check"></i> Salvar Usuário</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const appRoot = document.getElementById('page-container');
+    const statusMessage = document.getElementById('status-message');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const addUserModal = document.getElementById('add-user-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const addUserForm = document.getElementById('add-user-form');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+    
+    let allUsersCache = []; 
+    let logInterval = null;
+
+    const ENDPOINTS = {
+        STATS: `/admin/stats`,
+        USERS: `/admin/users`,
+        ADD_USER: `/admin/user/add`,
+        CARGO_UPDATE: (id) => `/admin/user/${id}/cargo`,
+        VIP_UPDATE: (id) => `/admin/user/${id}/vip`,
+        DELETE_USER: (id) => `/admin/user/${id}/delete`,
+        USER_MACHINES: (id) => `/admin/user/${id}/machines`,
+        DELETE_MACHINE: (id) => `/admin/machine/${id}/delete`,
+        LOGS: `/admin/logs`, 
+        CODE_UPDATE: (file) => `/admin/settings/${file}` 
+    };
+
+    function showStatusMessage(msg, type) {
+        statusMessage.textContent = msg;
+        statusMessage.className = `status-message ${type}`;
+        statusMessage.style.display = 'block';
+        setTimeout(() => statusMessage.style.display = 'none', 3000);
+    }
+
+    async function ajaxCall(endpoint, method = 'GET', data = null) {
+        loadingSpinner.style.display = 'block';
+        try {
+            const options = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: data ? JSON.stringify(data) : null
+            };
+            const response = await fetch(endpoint, options);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: `HTTP error! Status: ${response.status}` }));
+                throw new Error(errorData.message);
+            }
+            if (response.status === 204 || method === 'DELETE' || method === 'PUT') {
+                 return { status: 'success' };
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("AJAX Error:", error);
+            showStatusMessage(error.message || 'Erro de comunicação com o servidor.', 'error');
+            throw error;
+        } finally {
+            loadingSpinner.style.display = 'none';
+        }
+    }
+
+    async function renderDashboard() {
+        let stats = { total_usuarios: 1250, assinantes_vip: 450, maquinas_ativas: 80, uso_cache_mb: 512000 };
+        try {
+            stats = await ajaxCall(ENDPOINTS.STATS);
+        } catch (e) {
+            console.warn('Usando dados mockados para o Dashboard:', e.message);
+        }
+
+        appRoot.innerHTML = `
+            <div class="page-header">
+                <div><h1>Dashboard</h1><p>Visão Geral do Sistema</p></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="header"><h2>Total de Usuários</h2></div>
+                    <p>${stats.total_usuarios.toLocaleString('pt-BR')}</p>
+                    <i class="fas fa-users icon-bg"></i>
+                </div>
+                </div>
+        `;
+    }
+    
+    async function renderUsers() {
+        appRoot.innerHTML = `
+            <div class="page-header">
+                <div><h1>Gerenciamento de Usuários</h1><p>Controle total de contas e máquinas</p></div>
+                <button class="btn-primary" id="add-user-btn"><i class="fas fa-user-plus"></i> Cadastrar Usuário</button>
+            </div>
+            <input type="text" id="user-search" placeholder="Buscar por nome, email ou ID..." style="width:100%; margin-bottom:15px;">
+            <table class="data-table">
+                <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Cargo</th><th>VIP</th><th>Máquinas</th><th>Ações</th></tr></thead>
+                <tbody id="user-table-body">
+                    <tr><td colspan="7" style="text-align:center;">Carregando usuários...</td></tr>
+                </tbody>
+            </table>
+        `;
+        
+        document.getElementById('add-user-btn').addEventListener('click', () => {
+            addUserModal.classList.add('visible');
+        });
+        
+        const userTableBody = document.getElementById('user-table-body');
+        const userSearchInput = document.getElementById('user-search');
+
+        try {
+            const users = await ajaxCall(ENDPOINTS.USERS);
+            allUsersCache = users;
+            renderUserTable(users, userTableBody);
+        } catch (e) {
+            userTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger-red);">Erro ao carregar dados dos usuários.</td></tr>`;
+        }
+
+        userSearchInput.addEventListener('input', () => {
+            const searchText = userSearchInput.value.toLowerCase();
+            const filteredUsers = allUsersCache.filter(u => 
+                u.nome.toLowerCase().includes(searchText) || 
+                u.email.toLowerCase().includes(searchText) ||
+                u.id.toString().includes(searchText)
+            );
+            renderUserTable(filteredUsers, userTableBody);
+        });
+    }
+
+    function renderUserTable(users, bodyElement) {
+        bodyElement.innerHTML = '';
+        if (!users.length) {
+            bodyElement.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum usuário encontrado.</td></tr>';
+            return;
+        }
+        users.forEach(u => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${u.id}</td>
+                <td>${u.nome}</td>
+                <td>${u.email}</td>
+                <td>
+                    <select class="cargo-select" data-user-id="${u.id}" style="font-size:0.9rem; padding: 5px;">
+                        <option value="user" ${u.cargo === 'user' ? 'selected' : ''}>User</option>
+                        <option value="admin" ${u.cargo === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="moderator" ${u.cargo === 'moderator' ? 'selected' : ''}>Moderator</option>
+                    </select>
+                </td>
+                <td style="color:${u.vip ? 'var(--success-green)' : 'var(--danger-red)'}; font-weight:600;">${u.vip ? 'Ativo' : 'Inativo'}</td>
+                <td>
+                    <button class="btn-primary" style="padding: 5px 10px;" onclick="window.toggleMachines(${u.id})">Máquinas</button>
+                    <div id="machines-${u.id}" style="display:none; overflow-x:auto;"></div>
+                </td>
+                <td style="display:flex; gap:8px;">
+                    <button class="btn-${u.vip ? 'danger' : 'success'}" style="padding: 5px 10px;" onclick="window.toggleVIP(${u.id},${u.vip})">${u.vip ? 'Remover VIP' : 'Dar VIP'}</button>
+                    <button class="btn-danger" style="padding: 5px 10px;" onclick="window.deleteUser(${u.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            bodyElement.appendChild(row);
+        });
+    }
+
+    // --- Roteamento e Inicialização ---
+    const routes = {
+        '/admin/dashboard': renderDashboard,
+        '/admin/users': renderUsers,
+        // As outras rotas continuam aqui...
+    };
+
+    const router = () => {
+        let path = window.location.pathname;
+        if (path === '/' || !path.startsWith('/admin')) path = '/admin/dashboard'; 
+        
+        if(logInterval) {
+            clearInterval(logInterval);
+            logInterval = null; 
+        }
+
+        const renderFunction = routes[path];
+
+        if (renderFunction) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('active', link.getAttribute('data-route') === path);
+            });
+            renderFunction();
+            const pageName = path.split('/').pop().replace(/(\w)/, (x) => x.toUpperCase()) || 'Dashboard';
+            document.title = `SquareOS Admin | ${pageName}`;
+        } else {
+            appRoot.innerHTML = '<h1 style="color:var(--danger-red);">404 - Página Não Encontrada</h1>';
+        }
+    };
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const route = e.currentTarget.getAttribute('data-route');
+            window.history.pushState({}, '', route);
+            router();
+        });
+    });
+
+    closeModalBtn.addEventListener('click', () => addUserModal.classList.remove('visible'));
+    addUserModal.addEventListener('click', (e) => {
+        if (e.target === addUserModal) addUserModal.classList.remove('visible');
+    });
+
+    addUserForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('new-user-name').value;
+        const email = document.getElementById('new-user-email').value;
+        const password = document.getElementById('new-user-password').value;
+        const cargo = document.getElementById('new-user-cargo').value;
+
+        try {
+            await ajaxCall(ENDPOINTS.ADD_USER, 'POST', { nome, email, password, cargo });
+            showStatusMessage('Usuário cadastrado com sucesso!', 'success');
+            addUserModal.classList.remove('visible');
+            addUserForm.reset();
+            renderUsers(); // Recarrega a lista de usuários
+        } catch (error) {
+            // A mensagem de erro já é exibida pelo ajaxCall
+        }
+    });
+
+    sidebarToggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+    });
+
+    window.addEventListener('popstate', router);
+    router();
+});
+</script>
+</body>
+</html>

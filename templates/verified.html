@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SquareOS • Verificar</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+    /* --- Variáveis de Cores e Estilos - Tema Roxo/Neon --- */
+    :root {
+        --bg-dark: #000000;
+        --text-light: #F0F0FF;
+        --text-muted: #8F9BB3; /* Cinza azulado suave */
+        --primary-purple: #A366FF; /* Roxo principal */
+        --secondary-magenta: #E040FB; /* Magenta para gradientes */
+        --glass-bg: rgba(10, 10, 20, 0.75); /* Fundo escuro semi-transparente */
+        --border-color-subtle: rgba(163, 102, 255, 0.2);
+        --shadow-glow: 0 0 25px rgba(163, 102, 255, 0.3);
+        --shadow-deep: 0 10px 40px rgba(0, 0, 0, 0.7);
+        --transition-speed: 0.3s ease-in-out;
+        --success-green: #2ECC71; /* Não usado neste código, mas mantido na paleta */
+    }
+
+    /* --- Reset e Base --- */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit',sans-serif; }
+    body {
+        height:100vh; display:flex; justify-content:center; align-items:center;
+        background:var(--bg-dark);
+        color: var(--text-light);
+        overflow:hidden; position:relative;
+    }
+
+    /* --- Aura de Fundo --- */
+    .aura-glow {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        filter: blur(200px);
+        opacity: 0.4;
+        z-index: 0;
+        animation: moveAura 15s infinite alternate;
+    }
+    .aura-1 {
+        background: radial-gradient(circle, var(--primary-purple), transparent 60%);
+        top: 5%; left: 5%;
+    }
+    .aura-2 {
+        background: radial-gradient(circle, var(--secondary-magenta), transparent 60%);
+        bottom: 5%; right: 5%;
+        animation-delay: -7.5s;
+    }
+    @keyframes moveAura {
+        from { transform: translate(0, 0); }
+        to { transform: translate(50px, 50px); }
+    }
+
+    /* --- Container do Formulário (Redondo e Clean) --- */
+    .container {
+        position:relative;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border-radius:20px;
+        padding:40px;
+        width:100%;
+        max-width:400px;
+        text-align:center;
+        box-shadow:var(--shadow-deep), var(--shadow-glow);
+        z-index:1;
+        border:1px solid var(--border-color-subtle);
+    }
+
+    .title {
+        font-size:2rem; font-weight:700; color:var(--text-light); margin-bottom:15px;
+        letter-spacing:1.5px;
+        text-shadow: 0 0 10px rgba(163, 102, 255, 0.5);
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 30px;
+        line-height: 1.4;
+    }
+
+    /* --- Input Groups (Focado no Código) --- */
+    .input-group { 
+        position:relative; 
+        margin-bottom:30px; 
+    }
+
+    /* Ícone removido para focar no código, mas se precisar, descomente e ajuste o input padding */
+    /* .input-group i { ... } */
+    
+    input[type="text"] {
+        width:100%; 
+        padding:18px; /* Padding centralizado */
+        border:1px solid rgba(60, 60, 70, 0.5);
+        border-radius:12px;
+        background: rgba(30, 30, 40, 0.9);
+        color:var(--primary-purple); /* Cor de destaque no código */
+        font-size:1.5rem; 
+        font-weight:700; /* Mais negrito */
+        letter-spacing: 5px; /* Destaque no código */
+        text-align: center; /* Centraliza o código */
+        outline:none; transition:var(--transition-speed);
+        position:relative; z-index:1;
+    }
+
+    input::placeholder { 
+        color:var(--text-muted); 
+        font-weight: 500;
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+
+    input:focus {
+        background: rgba(30, 30, 40, 1);
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 15px rgba(163, 102, 255, 0.8); 
+    }
+
+    .btn-primary {
+        width:100%; 
+        padding:16px; 
+        margin-top:15px;
+        border:none; 
+        border-radius:12px;
+        font-size:1.05rem; 
+        font-weight:700; /* Mais peso */
+        cursor:pointer; 
+        transition:var(--transition-speed);
+        letter-spacing: 1px;
+        
+        background: linear-gradient(135deg, var(--primary-purple), var(--secondary-magenta));
+        color: var(--bg-dark);
+        box-shadow: 0 8px 25px rgba(163, 102, 255, 0.4);
+        text-transform: uppercase;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px); /* Efeito 3D mais suave */
+        box-shadow: 0 10px 30px rgba(163, 102, 255, 0.8);
+        background: linear-gradient(135deg, var(--secondary-magenta), var(--primary-purple)); /* Inverte o gradiente no hover */
+    }
+
+    /* --- Link Reenviar (Roxo e Magenta) --- */
+    .resend-link {
+        display: block;
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color var(--transition-speed), text-shadow var(--transition-speed);
+        font-weight: 500;
+    }
+    .resend-link:hover {
+        color: var(--primary-purple);
+        text-shadow: 0 0 8px rgba(224, 64, 251, 0.5); /* Sombra magenta sutil */
+    }
+    
+    /* --- Responsividade --- */
+    @media (max-width: 480px) {
+        .container {
+            width: 95%;
+            padding: 30px 25px;
+        }
+        .title {
+            font-size: 1.6rem;
+        }
+        input[type="text"] {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="aura-glow aura-1"></div>
+<div class="aura-glow aura-2"></div>
+
+<form action="/verified" method="post" autocomplete="off" novalidate>
+    <div class="container">
+        <p class="title">VERIFICAÇÃO DE ACESSO</p>
+        <p class="subtitle">Insira o código de 6 dígitos enviado para seu endereço de e-mail para validar seu acesso.</p>
+        
+        <div class="input-group">
+            <input type="text" placeholder="------" maxlength="6" id="codigo" name="codigo" required />
+        </div>
+        
+        <button type="submit" class="btn-primary">Validar Acesso</button>
+    
+        <a href="#" class="resend-link">Não recebeu o código? Reenviar</a>
+    </div>
+</form>
+</body>
+</html>

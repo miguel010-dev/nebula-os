@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SquareOS • Início</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="icon" href="https://i.postimg.cc/2yR5JBJd/logo.png" type="image/png">
+<style>
+/* --- VARIÁVEIS DE COR E ESTILO --- */
+:root {
+    /* Cores Escuras (Dark Theme - Padrão) */
+    --bg-dark: #0A0A1F;
+    --card-bg-dark: rgba(25, 25, 45, 0.7); /* Opacidade ligeiramente maior */
+    --nav-bg-dark: rgba(15, 15, 35, 0.9);
+    --sidebar-bg-dark: rgba(15, 15, 35, 0.95);
+    --text-light: #E0E0F0;
+    --text-muted: #AAB;
+    --border-subtle-dark: rgba(70, 70, 100, 0.4);
+    --shadow-deep: 0 12px 40px rgba(0, 0, 0, 0.7); /* Sombra mais profunda para glass */
+
+    /* Cores Claras (Light Theme) */
+    --bg-light: #F0F2F5;
+    --card-bg-light: rgba(255, 255, 255, 0.85);
+    --nav-bg-light: rgba(255, 255, 255, 0.95);
+    --sidebar-bg-light: rgba(255, 255, 255, 0.98);
+    --text-dark: #2C3E50;
+    --text-muted-light: #667788;
+    --border-subtle-light: rgba(200, 200, 220, 0.7);
+    --shadow-light: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --overlay-dark: rgba(0, 0, 0, 0.8);
+
+    /* Acentos */
+    --primary-gradient: linear-gradient(135deg, #A366FF, #E040FB);
+    --primary-color-start: #A366FF;
+    --primary-color-end: #E040FB;
+    --vip-gold: #FFD700;
+    --success-color: #2ECC71;
+    --danger-color: #E74C3C;
+
+    /* Efeitos */
+    --glass-blur: 30px;
+    --transition-speed: 0.4s ease-in-out;
+}
+
+/* --- ESTILOS BASE E ANIMAÇÕES --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    overflow-x: hidden;
+    position: relative;
+    transition: background var(--transition-speed), color var(--transition-speed);
+    line-height: 1.6;
+}
+
+body.light {
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+/* Animação de Entrada (Sensação) */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.anim-delay-1 { animation-delay: 0.1s; }
+.anim-delay-2 { animation-delay: 0.2s; }
+.anim-delay-3 { animation-delay: 0.3s; }
+
+.animated {
+    animation: fadeInUp 0.8s forwards;
+    opacity: 0;
+}
+
+/* --- BACKGROUND AURA --- */
+.aura-glow {
+    position: absolute;
+    width: 650px;
+    height: 650px;
+    border-radius: 50%;
+    filter: blur(280px);
+    opacity: 0.15;
+    z-index: 0;
+    animation: moveAura 30s infinite alternate ease-in-out;
+}
+.aura-1 { background: radial-gradient(circle, var(--primary-color-start), transparent 65%); top: -150px; left: -150px; }
+.aura-2 { background: radial-gradient(circle, var(--primary-color-end), transparent 65%); bottom: -150px; right: -150px; animation-delay: -15s; }
+@keyframes moveAura {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(100px, 100px) scale(1.05); }
+}
+
+/* --- NAVIGATION BAR --- */
+.nav {
+    position: sticky; 
+    top: 0;
+    height: 85px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+    z-index: 1000;
+    background: var(--nav-bg-dark);
+    backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--border-subtle-dark);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    transition: var(--transition-speed);
+}
+body.light .nav { background: var(--nav-bg-light); border-bottom: 1px solid var(--border-subtle-light); box-shadow: var(--shadow-light); }
+.logo { height: 50px; filter: brightness(1.1); } 
+
+.btn-icon {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: var(--transition-speed);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+body.light .btn-icon { color: var(--text-dark); background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-subtle-light); }
+.btn-icon:hover { background: var(--primary-color-start); color: #fff; transform: scale(1.08); box-shadow: 0 0 20px rgba(163, 102, 255, 0.7); border-color: var(--primary-color-start); }
+.btn-menu { background: var(--primary-gradient); color: #fff; border: none; box-shadow: 0 0 15px rgba(163, 102, 255, 0.6); }
+.btn-menu:hover { transform: rotate(90deg) scale(1.1); box-shadow: 0 0 25px rgba(163, 102, 255, 0.9); }
+
+
+/* --- SIDEBAR & OVERLAY --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    z-index: 1001;
+    padding: 40px 25px;
+    background: var(--sidebar-bg-dark);
+    backdrop-filter: blur(var(--glass-blur)); 
+    border-left: 1px solid var(--border-subtle-dark);
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.8);
+    transform: translateX(100%);
+    transition: transform var(--transition-speed);
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaço ajustado */
+}
+.sidebar.open { transform: translateX(0); }
+body.light .sidebar { background: var(--sidebar-bg-light); border-left: 1px solid var(--border-subtle-light); box-shadow: -8px 0 30px rgba(0, 0, 0, 0.1); }
+.sidebar-header { font-size: 1.8rem; font-weight: 700; color: var(--primary-color-start); margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--border-subtle-dark); text-shadow: 0 0 10px rgba(163, 102, 255, 0.3); }
+body.light .sidebar-header { border-bottom: 2px solid var(--border-subtle-light); text-shadow: none; }
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 15px 20px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--text-light);
+    transition: var(--transition-speed);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+}
+body.light .sidebar-item { background: rgba(0, 0, 0, 0.03); border: 1px solid var(--border-subtle-light); color: var(--text-dark); }
+.sidebar-item i { font-size: 1.3rem; color: var(--primary-color-start); width: 30px; text-align: center; }
+.sidebar-item:hover { background: rgba(163, 102, 255, 0.15); color: #fff; border-color: var(--primary-color-start); transform: translateX(-8px) scale(1.02); box-shadow: 0 5px 15px rgba(163, 102, 255, 0.3); }
+.sidebar-item.btn-primary-style { background: var(--primary-gradient); color: #fff; box-shadow: 0 8px 25px rgba(163, 102, 255, 0.6); border: none; margin-top: 10px; }
+.sidebar-item.btn-primary-style i { color: #fff; }
+.sidebar-item.btn-primary-style:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 15px 40px rgba(163, 102, 255, 0.9); }
+.sidebar-item.toggle-theme { justify-content: space-between; }
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay-dark); z-index: 999; visibility: hidden; opacity: 0; transition: opacity var(--transition-speed), visibility var(--transition-speed); }
+.overlay.open { visibility: visible; opacity: 1; }
+body.light .overlay { background: rgba(0, 0, 0, 0.4); }
+
+/* --- MAIN CONTENT & TYPOGRAPHY --- */
+.main-container {
+    position: relative;
+    padding: 90px 40px;
+    max-width: 1400px;
+    margin: auto;
+    z-index: 1;
+}
+h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 70px;
+    text-align: center;
+    letter-spacing: -2px;
+    text-shadow: 0 0 20px rgba(163, 102, 255, 0.4), 0 0 40px rgba(224, 64, 251, 0.2);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+body.light h1 { background: none; -webkit-background-clip: unset; -webkit-text-fill-color: unset; color: var(--text-dark); text-shadow: 0 0 5px rgba(0, 0, 0, 0.1); }
+
+/* --- SEARCH BAR --- */
+.search-bar { text-align: center; margin-bottom: 90px; }
+.search-bar input {
+    width: 100%;
+    max-width: 700px;
+    padding: 22px 35px;
+    border-radius: 20px;
+    outline: none;
+    font-size: 1.15rem;
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: var(--transition-speed);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+.search-bar input:focus { background: rgba(255, 255, 255, 0.12); border-color: var(--primary-color-start); box-shadow: 0 0 25px rgba(163, 102, 255, 0.9); transform: translateY(-3px); }
+body.light .search-bar input { background: var(--card-bg-light); color: var(--text-dark); border-color: var(--border-subtle-light); box-shadow: var(--shadow-light); }
+
+
+/* --- MACHINE CARDS --- */
+.maquinas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 50px;
+}
+.card {
+    background: var(--card-bg-dark);
+    backdrop-filter: blur(var(--glass-blur));
+    border-radius: 30px;
+    padding: 45px;
+    text-align: left;
+    box-shadow: var(--shadow-deep);
+    border: 1px solid var(--border-subtle-dark);
+    transition: transform 0.5s, box-shadow 0.5s, border-color 0.5s;
+    position: relative;
+    overflow: hidden;
+}
+.card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 30px 70px rgba(163, 102, 255, 0.55);
+    border-color: var(--primary-color-start);
+}
+body.light .card { background: var(--card-bg-light); box-shadow: 0 10px 35px rgba(0, 0, 0, 0.18); border-color: var(--border-subtle-light); }
+
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+.card-title { font-size: 2.1rem; font-weight: 700; letter-spacing: -0.5px; color: var(--text-light); }
+body.light .card-title { color: var(--text-dark); }
+.card-status { padding: 8px 18px; border-radius: 50px; font-size: 0.95rem; font-weight: 600; text-transform: uppercase; display: inline-flex; align-items: center; gap: 8px; color: #fff; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4); }
+.status-online { background: var(--success-color); }
+.status-offline { background: var(--danger-color); }
+.card-info { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 18px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; /* Melhor alinhamento */ }
+.card-info i { color: var(--primary-color-start); margin-right: 15px; min-width: 25px; font-size: 1.15em; }
+.info-label { flex-grow: 1; }
+.info-value { font-weight: 600; color: var(--text-light); text-align: right; }
+body.light .info-value { color: var(--text-dark); }
+.vip-status { color: var(--vip-gold); text-shadow: 0 0 8px rgba(255, 215, 0, 0.7); font-weight: 800; }
+.card-specs { border-top: 1px solid var(--border-subtle-dark); padding-top: 25px; margin-top: 25px; }
+body.light .card-specs { border-top: 1px solid var(--border-subtle-light); }
+.card-specs .card-info { margin-bottom: 12px; }
+.card-specs .card-info i { color: var(--primary-color-end); }
+
+/* --- BOTÕES E AÇÕES --- */
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 45px;
+}
+.btn {
+    flex-grow: 1; /* Permite que os botões ocupem o espaço total */
+    border: none;
+    border-radius: 15px;
+    padding: 16px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-speed);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 0.8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+}
+.btn-primary { background: var(--primary-gradient); color: #fff; box-shadow: 0 10px 30px rgba(163, 102, 255, 0.6); }
+.btn-primary:hover { transform: translateY(-5px); box-shadow: 0 18px 45px rgba(163, 102, 255, 0.9); }
+.btn-danger { background: var(--danger-color); color: #fff; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.5); }
+.btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(231, 76, 60, 0.8); }
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 1200px) {
+    .maquinas-grid { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; }
+    h1 { font-size: 3.5rem; }
+}
+@media (max-width: 900px) {
+    .nav { padding: 0 25px; height: 75px; }
+    .main-container { padding: 70px 25px; }
+    h1 { font-size: 3rem; margin-bottom: 60px; }
+    .sidebar { width: 280px; padding: 30px 20px; }
+}
+@media (max-width: 600px) {
+    .nav { padding: 0 15px; height: 65px; }
+    .main-container { padding: 50px 15px; }
+    h1 { font-size: 2.5rem; margin-bottom: 50px; letter-spacing: -1px; }
+    .maquinas-grid { grid-template-columns: 1fr; gap: 30px; }
+    .card { padding: 35px; border-radius: 25px; }
+    .card-title { font-size: 1.8rem; }
+    .search-bar input { padding: 18px 25px; font-size: 1rem; }
+    .card-actions { flex-direction: column; gap: 10px; }
+    .card-actions .btn { width: 100%; font-size: 0.95rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="aura-glow aura-1"></div>
+<div class="aura-glow aura-2"></div>
+
+<div class="overlay" onclick="toggleSidebar()"></div>
+
+<div class="sidebar" id="sidebar">
+        <img src="https://i.postimg.cc/Bb5DsJqN/SQUARE-SYSTEMS-removebg-preview.png" alt="">
+
+
+    <a href="{{ url_for('perfil1') }}" class="sidebar-item">
+        <i class="fa-solid fa-user"></i> Perfil do Usuário
+    </a>
+
+    <a href="{{ url_for('new_maquina') }}" class="sidebar-item btn-primary-style">
+        <i class="fa-solid fa-rocket"></i> Criar Nova Máquina
+    </a>
+
+    <button class="sidebar-item toggle-theme" onclick="toggleTheme()">
+        <i class="fa-solid fa-moon" id="theme-icon-sidebar"></i> <span>Alternar Tema</span>
+    </button>
+
+    
+    {% if user_info.vip %}
+        <span class="vip-medal" title="Usuário VIP">
+            <i class="fa-solid fa-medal"></i> VIP
+        </span>
+        {% else %}
+        <a href="{{ url_for('comprarvip') }}" class="sidebar-item btn-primary-style" style="padding: 10px 10px;">
+             <i class="fa-solid fa-star"></i> Obter VIP
+        </a>
+        {% endif %}
+    
+    <a href="#" class="sidebar-item">
+        <i class="fa-solid fa-circle-info"></i> Sobre
+    </a>
+
+</div>
+<style>
+    .btn btn-primary1{
+        height: 20px;
+    }
+</style>
+
+<div class="nav">
+    <img class="logo" src="https://i.postimg.cc/2yR5JBJd/logo.png" alt="Square OS" />
+    <button class="btn-icon btn-menu" onclick="toggleSidebar()" title="Abrir Menu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+</div>
+
+
+<div class="main-container">
+    <h1 class="animated anim-delay-1">Minhas Máquinas</h1>
+
+    <div class="search-bar animated anim-delay-2">
+        <input type="text" id="search" placeholder="Buscar máquina por nome..." onkeyup="filterMachines()" />
+    </div>
+
+    <div class="maquinas-grid animated anim-delay-3" id="maquinas-list">
+        {% for m in maquinas %}
+        <div class="card" data-name="{{ m.maquina_nome }}">
+            <div class="card-header">
+                <h3 class="card-title">{{ m.maquina_nome }}</h3>
+                <span class="card-status {% if m.online %}status-online{% else %}status-offline{% endif %}">
+                    {% if m.online %}<i class="fa-solid fa-circle-dot"></i> Online {% else %}<i class="fa-solid fa-power-off"></i> Offline {% endif %}
+                </span>
+            </div>
+            
+            <p class="card-info">
+                <i class="fa-solid fa-user-tag"></i> <span class="info-label">Usuário:</span> <span class="info-value">{{ m.usuario_nome }}</span>
+            </p>
+            
+            <p class="card-info">
+                <i class="fa-solid fa-medal"></i> <span class="info-label">Plano:</span>
+               <span class="info-value">
+                    {% if user_info.vip %}
+                        <span class="vip-status">VIP - Acesso Total</span>
+                    {% else %}
+                        GRATUITO
+                    {% endif %}
+                </span>
+            </p>
+            
+            <div class="card-specs">
+                <p class="card-info">
+                    <i class="fa-solid fa-microchip"></i> <span class="info-label">CPU:</span> <span class="info-value">{{ user_info.chip }}</span>
+                </p>
+                <p class="card-info">
+                    <i class="fa-solid fa-memory"></i> <span class="info-label">RAM:</span> <span class="info-value">{{ user_info.memoria }}</span>
+                </p>
+                <p class="card-info">
+                    <i class="fa-solid fa-hard-drive"></i> <span class="info-label">Disco:</span> <span class="info-value">{{ user_info.armazenamento }} GIGAS</span>
+                </p>
+            </div>
+            
+            <div class="card-actions">
+                <a href="{{ url_for('entrar_maquina', maquina_id=m.id) }}" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i> Iniciar / Entrar
+                </a>
+                
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+</div>
+
+<script>
+// Função para abrir e fechar a Sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+}
+
+// Função para Alternar o Tema (Dark/Light)
+function toggleTheme() {
+    const body = document.body;
+    body.classList.toggle("light");
+    const themeIconSidebar = document.getElementById("theme-icon-sidebar");
+    
+    // Atualiza o ícone e salva a preferência
+    if (body.classList.contains("light")) {
+        themeIconSidebar.classList.remove("fa-moon");
+        themeIconSidebar.classList.add("fa-sun");
+        localStorage.setItem('theme', 'light');
+    } else {
+        themeIconSidebar.classList.remove("fa-sun");
+        themeIconSidebar.classList.add("fa-moon");
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+// Aplica o tema salvo ao carregar a página
+(function applySavedTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const themeIconSidebar = document.getElementById("theme-icon-sidebar");
+    
+    if (savedTheme === 'light') {
+        document.body.classList.add('light');
+        themeIconSidebar.classList.remove("fa-moon");
+        themeIconSidebar.classList.add("fa-sun");
+    } else {
+        // Garante o ícone correto para o tema Dark (padrão)
+        themeIconSidebar.classList.remove("fa-sun");
+        themeIconSidebar.classList.add("fa-moon");
+    }
+})();
+
+// Função para Filtrar Máquinas (Search)
+function filterMachines() {
+    const input = document.getElementById("search").value.toLowerCase();
+    const machines = document.querySelectorAll(".card");
+    machines.forEach(m => {
+        const name = m.getAttribute("data-name").toLowerCase();
+        // Usa style.display = '' para restaurar a propriedade CSS do grid/flex
+        m.style.display = name.includes(input) ? "" : "none";
+    });
+}
+
+// Função para Confirmação de Exclusão (Refatorada para POST)
+function confirmDelete(machineName, deleteUrl) {
+    if (confirm(`Tem certeza que deseja excluir a máquina "${machineName}"? Esta ação não pode ser desfeita.`)) {
+        // Cria um formulário dinâmico para garantir o método POST para exclusão
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = deleteUrl;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+</body>
+</html>

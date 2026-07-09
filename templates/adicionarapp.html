@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Novo Aplicativo - SquareOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* --- Variáveis de Cores e Estilos - Tema Cyber Black/Neon (Consistente com a Loja) --- */
+        :root {
+            --bg-dark: #0A0A0E;
+            --text-light: #E0E0FF;
+            --text-muted: #6A798F;
+            --primary-neon: #00FFFF;
+            --secondary-neon: #FF00FF;
+            --glass-bg: rgba(15, 15, 30, 0.7);
+            --card-bg: rgba(20, 20, 40, 0.95);
+            --border-color-subtle: rgba(0, 255, 255, 0.15);
+            --shadow-glow: 0 0 15px rgba(0, 255, 255, 0.4);
+            --shadow-deep: 0 12px 45px rgba(0, 0, 0, 0.85);
+            --transition-speed: 0.3s ease-in-out;
+        }
+
+        /* --- Estilos Globais --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Centraliza o conteúdo verticalmente */
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-light);
+            text-shadow: var(--shadow-glow);
+            letter-spacing: 2px;
+            animation: pulseGlow 5s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.3); }
+            100% { text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(255, 0, 255, 0.2); }
+        }
+
+        /* Efeitos de Aura Neon (Fundo) */
+        .aura-glow {
+            position: fixed;
+            width: 400px; height: 400px;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .aura-1 { top: -10%; left: -10%; background: radial-gradient(circle, var(--primary-neon) 0%, transparent 70%); }
+        .aura-2 { bottom: -10%; right: -10%; background: radial-gradient(circle, var(--secondary-neon) 0%, transparent 70%); }
+
+        /* --- Container e Estilos do Formulário --- */
+        .form-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 30px 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color-subtle);
+            border-radius: 18px;
+            box-shadow: var(--shadow-deep);
+            backdrop-filter: blur(8px);
+            z-index: 1;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-neon);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border-color-subtle);
+            border-radius: 12px;
+            background: var(--glass-bg);
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+            box-sizing: border-box; /* Garante que padding não afete a largura total */
+        }
+        
+        input[type="text"]::placeholder,
+        input[type="url"]::placeholder,
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        textarea:focus {
+            border-color: var(--primary-neon);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        textarea {
+            resize: vertical; /* Permite redimensionar apenas na vertical */
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            text-align: center;
+            text-decoration: none;
+            color: var(--bg-dark);
+            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px var(--secondary-neon);
+        }
+        .submit-btn:active {
+            transform: scale(0.99);
+        }
+        .submit-btn i {
+            margin-right: 10px;
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-top: 20px;
+            display: inline-block;
+            transition: color var(--transition-speed), text-shadow var(--transition-speed);
+        }
+        .back-link:hover {
+            color: var(--primary-neon);
+            text-shadow: 0 0 5px var(--primary-neon);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="aura-glow aura-1"></div>
+    <div class="aura-glow aura-2"></div>
+
+    <div class="form-container">
+        <h1><i class="fas fa-rocket"></i> Cadastrar Novo App</h1>
+
+        <form method="POST" action="{{ url_for('cadastrar_app') }}">
+            
+            <div class="form-group">
+                <label for="nomeapp">Nome do Aplicativo</label>
+                <input type="text" id="nomeapp" name="nomeapp" required maxlength="150" placeholder="Ex: NeonPad v2.0">
+            </div>
+
+            <div class="form-group">
+                <label for="logoapp">URL do Logo</label>
+                <input type="url" id="logoapp" name="logoapp" required maxlength="1050" placeholder="https://exemplo.com/logo.png">
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição Completa</label>
+                <textarea id="descricao" name="descricao" required maxlength="1050" rows="6" placeholder="Descreva as funcionalidades, o propósito e os diferenciais do seu aplicativo..."></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-upload"></i> Cadastrar App
+            </button>
+        </form>
+    </div>
+    
+    <a href="{{ url_for('loja') }}" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a Loja</a>
+
+</body>
+</html>
